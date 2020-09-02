@@ -20,15 +20,15 @@ namespace AudioGraphExtensions
         private TaskCompletionSource<bool> _writeFileSuccess;
         private float[] _leftChannel;
         private float[] _rightChannel;
-        private readonly Action _finalizer;
+        private readonly Func<AudioGraph, IAudioNode, bool> _finalizer;
 
         protected AudioGraphOutputStream(
-            IAudioInputNode inputNode,
+            AudioFrameInputNode inputNode,
             IAudioNode outputNode,
             AudioGraph audioGraph,
             IProgress<double> progress,
             IProgress<string> status,
-            Action finalizer)
+            Func<AudioGraph, IAudioNode, bool> finalizer)
         {
             _finalizer = finalizer;
             _outputNode = outputNode;
@@ -38,6 +38,7 @@ namespace AudioGraphExtensions
             
             // Connect nodes
             inputNode.AddOutgoingConnection(outputNode);
+            inputNode.QuantumStarted += FrameInputNode_QuantumStarted;
         }
 
         public async Task<bool> Transfer(float[] left, float[] rihgt = null)
@@ -58,7 +59,7 @@ namespace AudioGraphExtensions
             return await _writeFileSuccess.Task;
         }
 
-        public async Task<AudioGraphOutputStream> ToFile(
+        public static async Task<AudioGraphOutputStream> ToFile(
             StorageFile file,
             IProgress<double> progress,
             IProgress<string> status,
@@ -69,15 +70,15 @@ namespace AudioGraphExtensions
 
             if (resultGraph.Status != AudioGraphCreationStatus.Success) return null;
 
-            var resultNode = await CreateAudioFileOutputNode(file, sampleRate, channelCount, resultGraph.Graph);
+            var resultOutputNode = await CreateAudioFileOutputNode(file, sampleRate, channelCount, resultGraph.Graph);
 
-            if (resultNode.Status != AudioFileNodeCreationStatus.Success) return null;
+            if (resultOutputNode.Status != AudioFileNodeCreationStatus.Success) return null;
             
             var frameInputNode = CreateAudioFrameInputNode(sampleRate, channelCount, resultGraph.Graph);
 
             var stream = new AudioGraphOutputStream(
                 frameInputNode,
-                resultNode.FileOutputNode,
+                resultOutputNode.FileOutputNode,
                 resultGraph.Graph,
                 progress,
                 status,
@@ -86,18 +87,19 @@ namespace AudioGraphExtensions
             return stream;
         }
 
-        private void FileFinalizer()
+        private static bool FileFinalizer(AudioGraph graph, IAudioNode outputNode)
         {
-            _audioGraph?.Stop();
-            _outputNode.Stop();
-            var result = ((AudioFileOutputNode) _outputNode)
+            graph?.Stop();
+            outputNode.Stop();
+            
+            var result = ((AudioFileOutputNode) outputNode)
                 .FinalizeAsync()
                 .GetResults();
 
-            _writeFileSuccess.TrySetResult(result == TranscodeFailureReason.None);
+            return result == TranscodeFailureReason.None;
         }
 
-        private AudioFrameInputNode CreateAudioFrameInputNode(
+        private static AudioFrameInputNode CreateAudioFrameInputNode(
             uint sampleRate,
             uint channelCount,
             AudioGraph graph)
@@ -110,9 +112,7 @@ namespace AudioGraphExtensions
             var frameInputNode = graph.CreateFrameInputNode(
                 frameInputNodeProperties
             );
-            
-            frameInputNode.QuantumStarted += FrameInputNode_QuantumStarted;
-            
+
             return frameInputNode;
         }
         
@@ -131,7 +131,7 @@ namespace AudioGraphExtensions
 
             if (finished)
             {
-                _finalizer();
+                _writeFileSuccess.SetResult(_finalizer(_audioGraph, _outputNode));
 
                 // clean status and progress 
                 _status.Report("");
