@@ -11,16 +11,19 @@ namespace AudioGraphExtensions
     public class AudioGraphOutputStream
     {
         private readonly AudioGraph _audioGraph;
+        private readonly IAudioInputNode _inputNode;
         private readonly IAudioNode _outputNode;
         private readonly Progress<double> _progress;
         private readonly IProgress<string> _status;
 
         protected AudioGraphOutputStream(
+            IAudioInputNode inputNode,
             IAudioNode outputNode,
             AudioGraph audioGraph,
             Progress<double> progress,
             IProgress<string> status)
         {
+            _inputNode = inputNode;
             _outputNode = outputNode;
             _audioGraph = audioGraph;
             _progress = progress;
@@ -41,10 +44,33 @@ namespace AudioGraphExtensions
             var resultNode = await CreateAudioFileOutputNode(file, sampleRate, channelCount, resultGraph.Graph);
 
             if (resultNode.Status != AudioFileNodeCreationStatus.Success) return null;
+            
+            var frameInputNode = CreateAudioFrameInputNode(sampleRate, channelCount, resultGraph.Graph);
 
-            var stream = new AudioGraphOutputStream(resultNode.FileOutputNode, resultGraph.Graph, progress, status);
+            var stream = new AudioGraphOutputStream(
+                frameInputNode,
+                resultNode.FileOutputNode,
+                resultGraph.Graph,
+                progress,
+                status);
 
             return stream;
+        }
+
+        private static AudioFrameInputNode CreateAudioFrameInputNode(
+            uint sampleRate,
+            uint channelCount,
+            AudioGraph graph)
+        {
+            var frameInputNodeProperties = graph.EncodingProperties;
+
+            frameInputNodeProperties.SampleRate = sampleRate;
+            frameInputNodeProperties.ChannelCount = channelCount;
+
+            var frameInputNode = graph.CreateFrameInputNode(
+                frameInputNodeProperties
+            );
+            return frameInputNode;
         }
 
         private static IAsyncOperation<CreateAudioGraphResult> CreateAudioGraphAsync()
