@@ -1,8 +1,7 @@
-﻿using System;
-
-namespace AudioGraphExtensions
+﻿namespace AudioGraphExtensions
 {
     public class AudioGraphInputStream
     {
+        
     }
 }
