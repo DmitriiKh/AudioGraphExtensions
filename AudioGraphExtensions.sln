@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioGraphExtensions", "AudioGraphExtensions\AudioGraphExtensions.csproj", "{D1FA3808-95A1-4861-80B2-23D5365E9559}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1FA3808-95A1-4861-80B2-23D5365E9559}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1FA3808-95A1-4861-80B2-23D5365E9559}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1FA3808-95A1-4861-80B2-23D5365E9559}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1FA3808-95A1-4861-80B2-23D5365E9559}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DFC9659-AAF3-4C38-AA10-A3FC286ADD55}
+	EndGlobalSection
+EndGlobal
