@@ -122,8 +122,13 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AudioInputArray.cs" />
     <Compile Include="AudioGraphInputStream.cs" />
-    <Compile Include="AudioGraphOutputStream.cs" />
+    <Compile Include="AudioOutputFile.cs" />
+    <Compile Include="AudioSystem.cs" />
+    <Compile Include="AudioSystemBuilder.cs" />
+    <Compile Include="IAudioInput.cs" />
+    <Compile Include="IAudioOutput.cs" />
     <Compile Include="IMemoryBufferByteAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\AudioGraphExtensions.rd.xml" />
