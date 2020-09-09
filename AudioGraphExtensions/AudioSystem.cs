@@ -37,6 +37,13 @@ namespace AudioGraphExtensions
             _audioGraph = await CreateAudioGraphAsync();
         }
 
+        public async Task SetInput(StorageFile file)
+        {
+            _audioInput = await AudioInputFile.CreateAsync(file, _audioGraph);
+
+            _audioInput.InputEnded += Stop;
+        }
+
         public void SetInput(float[] left, float[] right = null)
         {
             _audioInput = new AudioInputArray(_audioGraph, _sampleRate, _channelCount, left, right);
