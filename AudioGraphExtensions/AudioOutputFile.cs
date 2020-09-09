@@ -18,15 +18,15 @@ namespace AudioGraphExtensions
 
         public IAudioNode Node => _fileOutputNode;
 
-        public bool Stop()
+        public RunResult Stop()
         {
             Node.Stop();
 
-            var result = _fileOutputNode
+            var outputFileFinalizeResult = _fileOutputNode
                 .FinalizeAsync()
                 .GetResults();
 
-            return result == TranscodeFailureReason.None;
+            return new RunResult(outputFileFinalizeResult == TranscodeFailureReason.None, _fileOutputNode.File);
         }
 
         public static async Task<AudioOutputFile> CreateAsync(

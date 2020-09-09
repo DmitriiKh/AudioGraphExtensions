@@ -72,9 +72,9 @@ namespace AudioGraphExtensions
 
         public IAudioNode Node => _frameOutputNode;
         
-        public bool Stop()
+        public RunResult Stop()
         {
-            return true;
+            return new RunResult(true, _leftChannel, _rightChannel);
         }
     }
 }

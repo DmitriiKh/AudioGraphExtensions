@@ -132,6 +132,7 @@
     <Compile Include="IAudioOutput.cs" />
     <Compile Include="IMemoryBufferByteAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunResult.cs" />
     <EmbeddedResource Include="Properties\AudioGraphExtensions.rd.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@ namespace AudioGraphExtensions
         private readonly uint _sampleRate;
         private readonly IProgress<double> _progress;
         private readonly IProgress<string> _status;
-        private readonly TaskCompletionSource<bool> _writeFileSuccess;
+        private readonly TaskCompletionSource<RunResult> _writeFileSuccess;
         private AudioGraph _audioGraph;
         private IAudioInput _audioInput;
         private IAudioOutput _audioOutput;
@@ -29,7 +29,7 @@ namespace AudioGraphExtensions
             _status = status;
 
             // Prepare to return results asynchronously
-            _writeFileSuccess = new TaskCompletionSource<bool>();
+            _writeFileSuccess = new TaskCompletionSource<RunResult>();
         }
 
         public int InputLength => _audioInput.LengthInSamples;
@@ -65,7 +65,7 @@ namespace AudioGraphExtensions
             _audioOutput = new AudioOutputArray(_audioGraph, _sampleRate, _channelCount, left, right);
         }
 
-        public async Task<bool> StartAsync()
+        public async Task<RunResult> RunAsync()
         {
             _status?.Report("Saving audio file");
 

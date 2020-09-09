@@ -6,6 +6,6 @@ namespace AudioGraphExtensions
     {
         public IAudioNode Node { get; }
         
-        bool Stop();
+        RunResult Stop();
     }
 }
