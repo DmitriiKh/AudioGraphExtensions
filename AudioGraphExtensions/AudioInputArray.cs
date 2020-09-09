@@ -6,8 +6,8 @@ namespace AudioGraphExtensions
 {
     internal sealed class AudioInputArray : IAudioInput
     {
-        private readonly uint _channelCount;
         private readonly AudioFrameInputNode _frameInputNode;
+        private readonly uint _channelCount;
         private readonly float[] _leftChannel;
         private readonly float[] _rightChannel;
         private int _audioCurrentPosition;

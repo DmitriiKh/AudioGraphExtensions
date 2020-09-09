@@ -124,6 +124,7 @@
   <ItemGroup>
     <Compile Include="AudioInputArray.cs" />
     <Compile Include="AudioInputFile.cs" />
+    <Compile Include="AudioOutputArray.cs" />
     <Compile Include="AudioOutputFile.cs" />
     <Compile Include="AudioSystem.cs" />
     <Compile Include="AudioSystemBuilder.cs" />
