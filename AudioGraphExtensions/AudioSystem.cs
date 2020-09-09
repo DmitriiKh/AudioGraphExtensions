@@ -32,6 +32,10 @@ namespace AudioGraphExtensions
             _writeFileSuccess = new TaskCompletionSource<bool>();
         }
 
+        public int InputLength => _audioInput.LengthInSamples;
+        
+        public bool IsStereo => _channelCount == 2;
+
         public async Task InitAsync()
         {
             _audioGraph = await CreateAudioGraphAsync();

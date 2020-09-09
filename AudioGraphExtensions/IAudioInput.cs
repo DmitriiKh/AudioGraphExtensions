@@ -9,6 +9,8 @@ namespace AudioGraphExtensions
         
         double LengthInQuantum { get; }
         
+        int LengthInSamples { get; }
+
         event EventHandler InputEnded;
     }
 }

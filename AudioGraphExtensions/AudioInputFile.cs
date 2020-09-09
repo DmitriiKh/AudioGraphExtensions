@@ -7,7 +7,6 @@ namespace AudioGraphExtensions
 {
     public class AudioInputFile : IAudioInput
     {
-        
         private readonly AudioFileInputNode _fileInputNode;
         private uint _sampleRate;
         private uint _channelCount;
@@ -19,8 +18,9 @@ namespace AudioGraphExtensions
             _sampleRate = fileInputNode.EncodingProperties.SampleRate;
             _channelCount = fileInputNode.EncodingProperties.ChannelCount;
             
-            LengthInQuantum = (double) fileInputNode.EncodingProperties.SampleRate * fileInputNode.Duration.Seconds /
-                              samplesPerQuantum;
+            LengthInSamples =
+                (int) Math.Ceiling(fileInputNode.EncodingProperties.SampleRate * fileInputNode.Duration.TotalSeconds);
+            LengthInQuantum = (double) LengthInSamples / samplesPerQuantum;
             
             _fileInputNode.FileCompleted += OnFileCompleted;
         }
@@ -55,7 +55,8 @@ namespace AudioGraphExtensions
 
         public IAudioInputNode Node => _fileInputNode;
         public double LengthInQuantum { get; }
-        
+        public int LengthInSamples { get; }
+
         public event EventHandler InputEnded;
     }
 }

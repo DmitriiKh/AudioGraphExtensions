@@ -46,6 +46,14 @@ namespace AudioGraphExtensions
             _audioSystem.SetOutput(left, right);
             return this;
         }
+        
+        public async Task<AudioSystemBuilder> ToArray()
+        {
+            var left = new float[_audioSystem.InputLength];
+            var right = _audioSystem.IsStereo ? new float[_audioSystem.InputLength] : null;
+            await To(left, right);
+            return this;
+        }
 
         public AudioSystem Build()
         {
@@ -82,6 +90,13 @@ namespace AudioGraphExtensions
         {
             var builder = await antecedent;
             await builder.To(left, right);
+            return builder;
+        }
+        
+        public static async Task<AudioSystemBuilder>  ToArray(this Task<AudioSystemBuilder> antecedent)
+        {
+            var builder = await antecedent;
+            await builder.ToArray();
             return builder;
         }
 
