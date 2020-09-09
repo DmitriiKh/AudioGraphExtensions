@@ -26,6 +26,13 @@ namespace AudioGraphExtensions
             return this;
         }
 
+        public async Task<AudioSystemBuilder> From(StorageFile file)
+        {
+            await _initialization;
+            _audioSystem.SetInput(file);
+            return this;
+        }
+
         public async Task<AudioSystemBuilder> To(StorageFile file)
         {
             await _initialization;
@@ -46,6 +53,13 @@ namespace AudioGraphExtensions
         {
             var builder = await antecedent;
             await builder.From(left, right);
+            return builder;
+        }
+        
+        public static async Task<AudioSystemBuilder> From(this Task<AudioSystemBuilder> antecedent, StorageFile file)
+        {
+            var builder = await antecedent;
+            await builder.From(file);
             return builder;
         }
 
