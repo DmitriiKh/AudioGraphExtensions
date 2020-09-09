@@ -74,7 +74,7 @@ namespace AudioGraphExtensions
         
         public RunResult Stop()
         {
-            return new RunResult(true, _leftChannel, _rightChannel);
+            return new RunResult(true, _sampleRate, _leftChannel, _rightChannel);
         }
     }
 }
