@@ -62,7 +62,7 @@ namespace AudioGraphExtensions
             if (numSamplesNeeded == 0)
                 return;
 
-            var (frame, finished) = GenerateFrame(numSamplesNeeded);
+            var (frame, finished) = ArrayToFrame(numSamplesNeeded);
 
             sender.AddFrame(frame);
 
@@ -75,7 +75,7 @@ namespace AudioGraphExtensions
         }
 
         private unsafe (AudioFrame frame, bool finished)
-            GenerateFrame(int requiredSamples)
+            ArrayToFrame(int requiredSamples)
         {
             var bufferSize = (uint) (requiredSamples * sizeof(float) * _channelCount);
 
