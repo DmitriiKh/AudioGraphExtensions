@@ -29,7 +29,7 @@ namespace AudioGraphExtensions
         public async Task<AudioSystemBuilder> From(StorageFile file)
         {
             await _initialization;
-            _audioSystem.SetInput(file);
+            await _audioSystem.SetInput(file);
             return this;
         }
 
@@ -37,6 +37,13 @@ namespace AudioGraphExtensions
         {
             await _initialization;
             await _audioSystem.SetOutputAsync(file);
+            return this;
+        }
+        
+        public async Task<AudioSystemBuilder> To(float[] left, float[] right = null)
+        {
+            await _initialization;
+            _audioSystem.SetOutput(left, right);
             return this;
         }
 
@@ -67,6 +74,14 @@ namespace AudioGraphExtensions
         {
             var builder = await antecedent;
             await builder.To(file);
+            return builder;
+        }
+        
+        public static async Task<AudioSystemBuilder> To(this Task<AudioSystemBuilder> antecedent, float[] left,
+            float[] right = null)
+        {
+            var builder = await antecedent;
+            await builder.To(left, right);
             return builder;
         }
 

@@ -56,6 +56,11 @@ namespace AudioGraphExtensions
             _audioOutput = await AudioOutputFile.CreateAsync(file, _sampleRate, _channelCount, _audioGraph);
         }
 
+        public void SetOutput(float[] left, float[] right)
+        {
+            _audioOutput = new AudioOutputArray(_audioGraph, _sampleRate, _channelCount, left, right);
+        }
+
         public async Task<bool> StartAsync()
         {
             _status?.Report("Saving audio file");

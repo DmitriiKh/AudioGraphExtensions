@@ -5,6 +5,7 @@ namespace AudioGraphExtensions
     public class AudioOutputArray : IAudioOutput
     {
         private readonly AudioFrameOutputNode _frameOutputNode;
+        private readonly uint _sampleRate;
         private readonly uint _channelCount;
         private readonly float[] _leftChannel;
         private readonly float[] _rightChannel;
@@ -14,21 +15,15 @@ namespace AudioGraphExtensions
             AudioGraph graph,
             uint sampleRate,
             uint channelCount,
-            int lengthSamples)
+            float[] left,
+            float[] right)
         {
+            _sampleRate = sampleRate;
             _channelCount = channelCount;
-            _leftChannel = new float[lengthSamples];
-            if (channelCount > 1)
-            {
-                _rightChannel = new float[lengthSamples];
-            }
+            _leftChannel = left;
+            _rightChannel = right;
 
-            _frameOutputNode = CreateFrameOutputNode(sampleRate, channelCount, graph);
-        }
-
-        private AudioFrameOutputNode CreateFrameOutputNode(uint sampleRate, uint channelCount, AudioGraph graph)
-        {
-            throw new System.NotImplementedException();
+            _frameOutputNode = graph.CreateFrameOutputNode();
         }
 
         public IAudioNode Node => _frameOutputNode;
