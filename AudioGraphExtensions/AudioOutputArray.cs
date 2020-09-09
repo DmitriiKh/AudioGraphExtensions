@@ -1,4 +1,5 @@
-﻿using Windows.Media.Audio;
+﻿using Windows.Media;
+using Windows.Media.Audio;
 
 namespace AudioGraphExtensions
 {
@@ -24,6 +25,49 @@ namespace AudioGraphExtensions
             _rightChannel = right;
 
             _frameOutputNode = graph.CreateFrameOutputNode();
+            graph.QuantumStarted += GraphOnQuantumStarted;
+        }
+
+        private void GraphOnQuantumStarted(AudioGraph sender, object args)
+        {
+            var frame = _frameOutputNode.GetFrame();
+            FrameToArray(frame);
+        }
+        
+        private unsafe void FrameToArray(AudioFrame frame)
+        {
+            using (var buffer = frame.LockBuffer(AudioBufferAccessMode.Read))
+            using (var reference = buffer.CreateReference())
+            {
+                // Get data from current buffer
+                (reference as IMemoryBufferByteAccess).GetBuffer(
+                    out var dataInBytes,
+                    out var capacityInBytes
+                );
+
+                var dataInFloat = (float*) dataInBytes;
+
+                var capacityInFloat = capacityInBytes / sizeof(float);
+
+                // Transfer audio samples from buffer to audio arrays
+                for (uint index = 0; index < capacityInFloat; index += _channelCount)
+                {
+                    if (_audioCurrentPosition >= _leftChannel.Length)
+                    {
+                        break;
+                    }
+
+                    _leftChannel[_audioCurrentPosition] = dataInFloat[index];
+
+                    // if stereo
+                    if (_channelCount == 2)
+                    {
+                        _rightChannel[_audioCurrentPosition] = dataInFloat[index + 1];
+                    }
+
+                    _audioCurrentPosition++;
+                }
+            }
         }
 
         public IAudioNode Node => _frameOutputNode;
