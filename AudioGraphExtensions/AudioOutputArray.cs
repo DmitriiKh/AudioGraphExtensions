@@ -74,7 +74,7 @@ namespace AudioGraphExtensions
         
         public bool Stop()
         {
-            throw new System.NotImplementedException();
+            return true;
         }
     }
 }
