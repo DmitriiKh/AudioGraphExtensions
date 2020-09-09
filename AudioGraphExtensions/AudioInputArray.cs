@@ -24,7 +24,7 @@ namespace AudioGraphExtensions
             _rightChannel = right;
 
             LengthInSamples = left.Length;
-            LengthInQuantum = (double) left.Length / graph.SamplesPerQuantum;
+            LengthInQuantum = (int)Math.Ceiling((double)left.Length / graph.SamplesPerQuantum);
 
             _frameInputNode = CreateAudioFrameInputNode(sampleRate, channelCount, graph);
             _frameInputNode.QuantumStarted += FrameInputNode_QuantumStarted;
@@ -36,7 +36,7 @@ namespace AudioGraphExtensions
 
         public IAudioInputNode Node => _frameInputNode;
 
-        public double LengthInQuantum { get; }
+        public int LengthInQuantum { get; }
 
         private static AudioFrameInputNode CreateAudioFrameInputNode(
             uint sampleRate,
