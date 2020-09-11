@@ -24,7 +24,11 @@ namespace AudioGraphExtensions
             _leftChannel = left;
             _rightChannel = right;
 
-            _frameOutputNode = graph.CreateFrameOutputNode();
+            var properties = graph.EncodingProperties;
+            properties.SampleRate = sampleRate;
+            properties.ChannelCount = channelCount;
+
+            _frameOutputNode = graph.CreateFrameOutputNode(properties);
             graph.QuantumStarted += GraphOnQuantumStarted;
         }
 
