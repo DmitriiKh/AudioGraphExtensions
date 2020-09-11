@@ -6,104 +6,123 @@ namespace AudioGraphExtensions
 {
     public class AudioSystemBuilder
     {
-        private readonly AudioSystem _audioSystem;
-        private readonly Task _initialization;
+        private AudioSystem _audioSystem;
+        private uint _sampleRate;
+        private uint _channelCount;
+        private IProgress<double> _progress;
+        private IProgress<string> _status;
+        private IData _inputData;
+        private IData _outputData;
 
-        internal AudioSystemBuilder(
-            uint sampleRate,
-            uint channelCount,
-            IProgress<double> progress = null,
-            IProgress<string> status = null)
+        internal AudioSystemBuilder()
         {
-            _audioSystem = new AudioSystem(sampleRate, channelCount, progress, status);
-            _initialization = _audioSystem.InitAsync();
         }
 
-        public async Task<AudioSystemBuilder> From(float[] left, float[] right = null)
+        public AudioSystemBuilder SampleRate(uint sampleRate)
         {
-            await _initialization;
-            _audioSystem.SetInput(left, right);
+            _sampleRate = sampleRate;
             return this;
         }
 
-        public async Task<AudioSystemBuilder> From(StorageFile file)
+        public AudioSystemBuilder Channels(uint channelCount)
         {
-            await _initialization;
-            await _audioSystem.SetInput(file);
-            return this;
-        }
-
-        public async Task<AudioSystemBuilder> To(StorageFile file)
-        {
-            await _initialization;
-            await _audioSystem.SetOutputAsync(file);
+            _channelCount = channelCount;
             return this;
         }
         
-        public async Task<AudioSystemBuilder> To(float[] left, float[] right = null)
+        public AudioSystemBuilder Report(IProgress<string> status, IProgress<double> progress)
         {
-            await _initialization;
-            _audioSystem.SetOutput(left, right);
-            return this;
-        }
-        
-        public async Task<AudioSystemBuilder> ToArray()
-        {
-            var left = new float[_audioSystem.InputLength];
-            var right = _audioSystem.IsStereo ? new float[_audioSystem.InputLength] : null;
-            await To(left, right);
+            _status = status;
+            _progress = progress;
             return this;
         }
 
-        public AudioSystem Build()
+        public AudioSystemBuilder From(StorageFile file)
         {
+            _inputData = new FileData(file);
+            return this;
+        }
+
+        public AudioSystemBuilder From(float[] left, float[] right = null)
+        {
+            _inputData = new ArrayData(left, right);
+            return this;
+        }
+
+        public AudioSystemBuilder To(StorageFile file)
+        {
+            _outputData = new FileData(file);
+            return this;
+        }
+
+        public AudioSystemBuilder To(float[] left, float[] right = null)
+        {
+            _outputData = new ArrayData(left, right);
+            return this;
+        }
+
+        public async Task<AudioSystem> BuildAsync()
+        {
+            await Init();
+
+            await _inputData.ConnectAsInputAsync(_audioSystem);
+
+            if (_outputData is null)
+            {
+                var left = new float[_audioSystem.InputLength];
+                var right = _audioSystem.IsStereo ? new float[_audioSystem.InputLength] : null;
+                _audioSystem.SetOutput(left, right);
+            }
+            else
+            {
+                await _outputData.ConnectAsOutputAsync(_audioSystem);
+            }
+            
             return _audioSystem;
         }
-    }
 
-    public static class AudioSystemBuilderExtension
-    {
-        public static async Task<AudioSystemBuilder> From(this Task<AudioSystemBuilder> antecedent, float[] left,
-            float[] right = null)
+        private async Task Init()
         {
-            var builder = await antecedent;
-            await builder.From(left, right);
-            return builder;
-        }
-        
-        public static async Task<AudioSystemBuilder> From(this Task<AudioSystemBuilder> antecedent, StorageFile file)
-        {
-            var builder = await antecedent;
-            await builder.From(file);
-            return builder;
+            _audioSystem = new AudioSystem(_sampleRate, _channelCount, _progress, _status);
+            await _audioSystem.InitAsync();
         }
 
-        public static async Task<AudioSystemBuilder> To(this Task<AudioSystemBuilder> antecedent, StorageFile file)
+        private interface IData
         {
-            var builder = await antecedent;
-            await builder.To(file);
-            return builder;
-        }
-        
-        public static async Task<AudioSystemBuilder> To(this Task<AudioSystemBuilder> antecedent, float[] left,
-            float[] right = null)
-        {
-            var builder = await antecedent;
-            await builder.To(left, right);
-            return builder;
-        }
-        
-        public static async Task<AudioSystemBuilder>  ToArray(this Task<AudioSystemBuilder> antecedent)
-        {
-            var builder = await antecedent;
-            await builder.ToArray();
-            return builder;
+            Task ConnectAsInputAsync(AudioSystem system);
+            Task ConnectAsOutputAsync(AudioSystem system);
         }
 
-        public static async Task<AudioSystem> BuildAsync(this Task<AudioSystemBuilder> antecedent)
+        private sealed class ArrayData : IData
         {
-            var builder = await antecedent;
-            return builder.Build();
+            private readonly float[] _left;
+            private readonly float[] _right;
+
+            public ArrayData(float[] left, float[] right)
+            {
+                _left = left;
+                _right = right;
+            }
+
+            public async Task ConnectAsInputAsync(AudioSystem system) => 
+                await Task.Run(() => system.SetInput(_left, _right));
+
+            public async Task ConnectAsOutputAsync(AudioSystem system) => 
+                await Task.Run(() => system.SetOutput(_left, _right));
+        }
+        
+        private sealed class FileData : IData
+        {
+            private readonly StorageFile _file;
+
+            public FileData(StorageFile file) => 
+                _file = file;
+
+            public async Task ConnectAsInputAsync(AudioSystem system) => 
+                await system.SetInputAsync(_file);
+
+            public async Task ConnectAsOutputAsync(AudioSystem system) => 
+                await system.SetOutputAsync(_file);
         }
     }
 }
