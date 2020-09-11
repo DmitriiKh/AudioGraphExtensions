@@ -5,7 +5,7 @@ using Windows.Media.MediaProperties;
 using Windows.Media.Transcoding;
 using Windows.Storage;
 
-namespace AudioGraphExtensions
+namespace AudioGraphExtensions.Nodes
 {
     internal sealed class AudioOutputFile : IAudioOutput
     {

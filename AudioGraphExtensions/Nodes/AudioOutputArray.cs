@@ -1,7 +1,7 @@
 ﻿using Windows.Media;
 using Windows.Media.Audio;
 
-namespace AudioGraphExtensions
+namespace AudioGraphExtensions.Nodes
 {
     public class AudioOutputArray : IAudioOutput
     {

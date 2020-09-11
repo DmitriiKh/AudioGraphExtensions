@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Windows.Media.Audio;
 using Windows.Media.Render;
 using Windows.Storage;
+using AudioGraphExtensions.Nodes;
 
 namespace AudioGraphExtensions
 {

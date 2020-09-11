@@ -2,7 +2,7 @@
 using Windows.Media;
 using Windows.Media.Audio;
 
-namespace AudioGraphExtensions
+namespace AudioGraphExtensions.Nodes
 {
     internal sealed class AudioInputArray : IAudioInput
     {
