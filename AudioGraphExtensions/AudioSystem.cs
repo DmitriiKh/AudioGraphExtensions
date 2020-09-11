@@ -92,7 +92,7 @@ namespace AudioGraphExtensions
         private void ReportProgress(AudioGraph sender, object args)
         {
             //to not report too many times
-            if (_audioGraph.CompletedQuantumCount % 100 != 0) return;
+            if (_audioGraph.CompletedQuantumCount % 10 != 0) return;
 
             var dProgress =
                 (double) 100 *
