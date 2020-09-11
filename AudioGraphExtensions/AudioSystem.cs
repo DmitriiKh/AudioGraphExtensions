@@ -8,8 +8,8 @@ namespace AudioGraphExtensions
 {
     public class AudioSystem
     {
-        private readonly uint _channelCount;
-        private readonly uint _sampleRate;
+        private uint _channelCount;
+        private uint _sampleRate;
         private readonly IProgress<double> _progress;
         private readonly IProgress<string> _status;
         private readonly TaskCompletionSource<RunResult> _writeFileSuccess;
@@ -41,11 +41,19 @@ namespace AudioGraphExtensions
             _audioGraph = await CreateAudioGraphAsync();
         }
 
-        public async Task SetInput(StorageFile file)
+        public async Task SetInputAsync(StorageFile file)
         {
             _audioInput = await AudioInputFile.CreateAsync(file, _audioGraph);
 
+            InheritInputSetting();
+
             _audioInput.InputEnded += Stop;
+        }
+
+        private void InheritInputSetting()
+        {
+            _channelCount = _audioInput.Node.EncodingProperties.ChannelCount;
+            _sampleRate = _audioInput.Node.EncodingProperties.SampleRate;
         }
 
         public void SetInput(float[] left, float[] right = null)
@@ -67,7 +75,7 @@ namespace AudioGraphExtensions
 
         public async Task<RunResult> RunAsync()
         {
-            _status?.Report("Saving audio file");
+            _status?.Report("Working...");
 
             _audioInput.Node.AddOutgoingConnection(_audioOutput.Node);
 
@@ -75,14 +83,10 @@ namespace AudioGraphExtensions
 
             return await _writeFileSuccess.Task;
         }
-
-        public static AudioSystemBuilder Builder(
-            uint sampleRate,
-            uint channelCount,
-            IProgress<double> progress = null,
-            IProgress<string> status = null)
+        
+        public static AudioSystemBuilder Builder()
         {
-            return new AudioSystemBuilder(sampleRate, channelCount, progress, status);
+            return new AudioSystemBuilder();
         }
 
         private void ReportProgress(AudioGraph sender, object args)
@@ -113,6 +117,7 @@ namespace AudioGraphExtensions
         private async Task<AudioGraph> CreateAudioGraphAsync()
         {
             var mediaSettings = new AudioGraphSettings(AudioRenderCategory.Media);
+
             var resultGraph = await AudioGraph.CreateAsync(mediaSettings);
 
             if (resultGraph.Status != AudioGraphCreationStatus.Success) throw resultGraph.ExtendedError;
