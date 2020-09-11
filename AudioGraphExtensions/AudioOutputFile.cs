@@ -24,11 +24,13 @@ namespace AudioGraphExtensions
         {
             Node.Stop();
 
+            var file = _fileOutputNode.File;
+            
             var outputFileFinalizeResult = _fileOutputNode
                 .FinalizeAsync()
                 .GetResults();
 
-            return new RunResult(outputFileFinalizeResult == TranscodeFailureReason.None, _sampleRate, _fileOutputNode.File);
+            return new RunResult(outputFileFinalizeResult == TranscodeFailureReason.None, _sampleRate, file);
         }
 
         public static async Task<AudioOutputFile> CreateAsync(
