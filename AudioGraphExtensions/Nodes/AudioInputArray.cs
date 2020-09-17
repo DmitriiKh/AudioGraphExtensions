@@ -74,8 +74,7 @@ namespace AudioGraphExtensions.Nodes
             InputEnded?.Invoke(this, EventArgs.Empty);
         }
 
-        private unsafe (AudioFrame frame, bool finished)
-            ArrayToFrame(int requiredSamples)
+        private unsafe (AudioFrame frame, bool finished) ArrayToFrame(int requiredSamples)
         {
             var bufferSize = (uint) (requiredSamples * sizeof(float) * _channelCount);
 
@@ -97,8 +96,13 @@ namespace AudioGraphExtensions.Nodes
                 for (uint index = 0; index < capacityInFloat; index += _channelCount)
                 {
                     if (_audioCurrentPosition >= _leftChannel.Length)
-                        // last frame can be not full
+                    {
+                        // fill the rest with zeros
+                        for (var indexForZeros = index; indexForZeros < capacityInFloat; indexForZeros++)
+                            dataInFloat[indexForZeros] = 0;
+
                         return (frame, true);
+                    }
 
                     dataInFloat[index] = _leftChannel[_audioCurrentPosition];
 
