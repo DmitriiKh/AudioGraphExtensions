@@ -2,3 +2,5 @@
 /.vs/AudioGraphExtensions/
 /AudioGraphExtensions/bin/
 /AudioGraphExtensions/obj/
+/UnitTestProjectMsTest/bin/
+/UnitTestProjectMsTest/obj/
