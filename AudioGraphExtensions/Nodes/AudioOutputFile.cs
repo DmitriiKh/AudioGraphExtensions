@@ -22,15 +22,15 @@ namespace AudioGraphExtensions.Nodes
 
         public RunResult Stop()
         {
-            Node.Stop();
-
             var file = _fileOutputNode.File;
-            
-            var outputFileFinalizeResult = _fileOutputNode
-                .FinalizeAsync()
-                .GetResults();
 
-            return new RunResult(outputFileFinalizeResult == TranscodeFailureReason.None, _sampleRate, file);
+            var finalizeTask = _fileOutputNode.FinalizeAsync().AsTask();
+
+            var finalizeResult = finalizeTask.GetAwaiter().GetResult();
+
+            bool success = finalizeResult == TranscodeFailureReason.None;
+
+            return new RunResult(success, _sampleRate, file);
         }
 
         public static async Task<AudioOutputFile> CreateAsync(

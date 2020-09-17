@@ -17,6 +17,7 @@ namespace AudioGraphExtensions
         private AudioGraph _audioGraph;
         private IAudioInput _audioInput;
         private IAudioOutput _audioOutput;
+        private bool _lastFrame;
 
         public AudioSystem(
             uint sampleRate,
@@ -48,7 +49,7 @@ namespace AudioGraphExtensions
 
             InheritInputSetting();
 
-            _audioInput.InputEnded += Stop;
+            _audioInput.InputEnded += OnLastFrame;
         }
 
         private void InheritInputSetting()
@@ -61,7 +62,7 @@ namespace AudioGraphExtensions
         {
             _audioInput = new AudioInputArray(_audioGraph, _sampleRate, _channelCount, left, right);
 
-            _audioInput.InputEnded += Stop;
+            _audioInput.InputEnded += OnLastFrame;
         }
 
         public async Task SetOutputAsync(StorageFile file)
@@ -76,6 +77,8 @@ namespace AudioGraphExtensions
 
         public async Task<RunResult> RunAsync()
         {
+            _lastFrame = false;
+
             _status?.Report("Working...");
 
             _audioInput.Node.AddOutgoingConnection(_audioOutput.Node);
@@ -90,7 +93,7 @@ namespace AudioGraphExtensions
             return new AudioSystemBuilder();
         }
 
-        private void ReportProgress(AudioGraph sender, object args)
+        private void ReportProgress()
         {
             //to not report too many times
             if (_audioGraph.CompletedQuantumCount % 10 != 0) return;
@@ -103,16 +106,9 @@ namespace AudioGraphExtensions
             _progress?.Report(dProgress);
         }
 
-        private void Stop(object sender, EventArgs e)
+        private void OnLastFrame(object sender, EventArgs e)
         {
-            _audioGraph?.Stop();
-            var finalizeResult = _audioOutput.Stop();
-
-            _writeFileSuccess.SetResult(finalizeResult);
-
-            // clean status and progress 
-            _status?.Report("");
-            _progress?.Report(0);
+            _lastFrame = true;
         }
 
         private async Task<AudioGraph> CreateAudioGraphAsync()
@@ -123,9 +119,29 @@ namespace AudioGraphExtensions
 
             if (resultGraph.Status != AudioGraphCreationStatus.Success) throw resultGraph.ExtendedError;
 
-            resultGraph.Graph.QuantumProcessed += ReportProgress;
+            resultGraph.Graph.QuantumProcessed += AudioSystem_QuantumProcessed;
 
             return resultGraph.Graph;
+        }
+
+        private void AudioSystem_QuantumProcessed(AudioGraph sender, object args)
+        {
+            if (_lastFrame)
+            {
+                _audioGraph.Stop();
+
+                var result = _audioOutput.Stop();
+
+                _writeFileSuccess.SetResult(result);
+
+                // clean status and progress 
+                _status?.Report("");
+                _progress?.Report(0);
+            }
+            else
+            {
+                ReportProgress();
+            }
         }
     }
 }
