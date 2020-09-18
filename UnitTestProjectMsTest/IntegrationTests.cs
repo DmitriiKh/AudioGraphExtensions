@@ -32,7 +32,7 @@ namespace UnitTestProjectMsTest
 
             var storageFolder = ApplicationData.Current.LocalFolder;
             var outputFile = await storageFolder.CreateFileAsync(
-                "square44100.wav",
+                "square44100-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
@@ -63,7 +63,7 @@ namespace UnitTestProjectMsTest
 
             var storageFolder = ApplicationData.Current.LocalFolder;
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw44100.wav",
+                "saw44100-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
@@ -77,11 +77,42 @@ namespace UnitTestProjectMsTest
         }
 
         [TestMethod]
+        public async Task UsingBuilder_AudioSystem_SawToStereo()
+        {
+            const int arrayLength = 44100;
+
+            var saw = new float[arrayLength];
+            var current = 0f;
+            var step = 0.25f;
+            for (var index = 0; index < saw.Length; index++)
+            {
+                saw[index] = current;
+                current += step;
+
+                if (current >= 1 || current <= -1) step = -step;
+            }
+
+            var storageFolder = ApplicationData.Current.LocalFolder;
+            var outputFile = await storageFolder.CreateFileAsync(
+                "saw44100-stereo.wav",
+                CreationCollisionOption.ReplaceExisting);
+
+            var builder = AudioSystem.Builder();
+            builder.SampleRate(44100).Channels(2);
+            builder.From(saw, saw).To(outputFile);
+
+            var audioSystem = await builder.BuildAsync();
+            var result = await audioSystem.RunAsync();
+
+            Assert.AreEqual(true, result.Success, result.OutputFile.Path);
+        }
+
+        [TestMethod]
         public async Task UsingBuilder_AudioSystem_MonoToArray()
         {
             var storageFolder = ApplicationData.Current.LocalFolder;
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw44100.wav"));
+                Path.Combine(storageFolder.Path, "saw44100-stereo.wav"));
 
             var builder = AudioSystem.Builder();
             builder.From(inputFile);
