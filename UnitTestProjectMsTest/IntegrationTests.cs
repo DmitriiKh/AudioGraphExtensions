@@ -13,12 +13,14 @@ namespace UnitTestProjectMsTest
     {
         private static StorageFolder storageFolder;
         private static float[] square;
+        private static float[] saw;
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext context)
         {
             storageFolder = ApplicationData.Current.LocalFolder;
             square = GetSquare(44100, 4);
+            saw = GetSaw(44100, 0.25f);
         }
 
         [TestMethod]
@@ -41,19 +43,6 @@ namespace UnitTestProjectMsTest
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawToMono()
         {
-            const int arrayLength = 44100;
-
-            var saw = new float[arrayLength];
-            var current = 0f;
-            var step = 0.25f;
-            for (var index = 0; index < saw.Length; index++)
-            {
-                saw[index] = current;
-                current += step;
-
-                if (current >= 1 || current <= -1) step  = -step;
-            }
-
             var outputFile = await storageFolder.CreateFileAsync(
                 "saw44100-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
@@ -71,19 +60,6 @@ namespace UnitTestProjectMsTest
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawToStereo()
         {
-            const int arrayLength = 44100;
-
-            var saw = new float[arrayLength];
-            var current = 0f;
-            var step = 0.25f;
-            for (var index = 0; index < saw.Length; index++)
-            {
-                saw[index] = current;
-                current += step;
-
-                if (current >= 1 || current <= -1) step = -step;
-            }
-
             var outputFile = await storageFolder.CreateFileAsync(
                 "saw44100-stereo.wav",
                 CreationCollisionOption.ReplaceExisting);
@@ -130,6 +106,21 @@ namespace UnitTestProjectMsTest
             }
 
             return square;
+        }
+
+        private static float[] GetSaw(int arrayLength, float step)
+        {
+            var saw = new float[arrayLength];
+            var current = 0f;
+            for (var index = 0; index < saw.Length; index++)
+            {
+                saw[index] = current;
+                current += step;
+
+                if (current >= 1 || current <= -1) step = -step;
+            }
+
+            return saw;
         }
     }
 }
