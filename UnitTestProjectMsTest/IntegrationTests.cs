@@ -11,6 +11,14 @@ namespace UnitTestProjectMsTest
     [TestClass]
     public class IntegrationTests
     {
+        private static StorageFolder storageFolder;
+
+        [AssemblyInitialize]
+        public static void AssemblyInit(TestContext context)
+        {
+            storageFolder = ApplicationData.Current.LocalFolder;
+        }
+
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SquareToMono()
         {
@@ -30,7 +38,6 @@ namespace UnitTestProjectMsTest
                 }
             }
 
-            var storageFolder = ApplicationData.Current.LocalFolder;
             var outputFile = await storageFolder.CreateFileAsync(
                 "square44100-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
@@ -61,7 +68,6 @@ namespace UnitTestProjectMsTest
                 if (current >= 1 || current <= -1) step  = -step;
             }
 
-            var storageFolder = ApplicationData.Current.LocalFolder;
             var outputFile = await storageFolder.CreateFileAsync(
                 "saw44100-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
@@ -92,7 +98,6 @@ namespace UnitTestProjectMsTest
                 if (current >= 1 || current <= -1) step = -step;
             }
 
-            var storageFolder = ApplicationData.Current.LocalFolder;
             var outputFile = await storageFolder.CreateFileAsync(
                 "saw44100-stereo.wav",
                 CreationCollisionOption.ReplaceExisting);
@@ -110,7 +115,6 @@ namespace UnitTestProjectMsTest
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_MonoToArray()
         {
-            var storageFolder = ApplicationData.Current.LocalFolder;
             var inputFile = await StorageFile.GetFileFromPathAsync(
                 Path.Combine(storageFolder.Path, "saw44100-mono.wav"));
 
