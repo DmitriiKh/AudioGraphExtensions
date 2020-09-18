@@ -103,6 +103,25 @@ namespace UnitTestProjectMsTest
             Assert.AreEqual(true, result.Success);
         }
 
+        [TestMethod]
+        public async Task UsingBuilder_AudioSystem_MonoToMono()
+        {
+            var inputFile = await StorageFile.GetFileFromPathAsync(
+                Path.Combine(storageFolder.Path, "saw44100-mono.wav"));
+
+            var outputFile = await storageFolder.CreateFileAsync(
+                "saw44100-mono-to-mono.wav",
+                CreationCollisionOption.ReplaceExisting);
+
+            var builder = AudioSystem.Builder();
+            builder.From(inputFile).To(outputFile);
+
+            var audioSystem = await builder.BuildAsync();
+            var result = await audioSystem.RunAsync();
+
+            Assert.AreEqual(true, result.Success);
+        }
+
         private static float[] GetSquare(int arrayLength, int halfPeriod)
         {
             var square = new float[arrayLength];
