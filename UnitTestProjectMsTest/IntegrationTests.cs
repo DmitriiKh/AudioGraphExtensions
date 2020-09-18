@@ -112,7 +112,7 @@ namespace UnitTestProjectMsTest
         {
             var storageFolder = ApplicationData.Current.LocalFolder;
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw44100-stereo.wav"));
+                Path.Combine(storageFolder.Path, "saw44100-mono.wav"));
 
             var builder = AudioSystem.Builder();
             builder.From(inputFile);
@@ -121,6 +121,7 @@ namespace UnitTestProjectMsTest
             var result = await audioSystem.RunAsync();
 
             Assert.AreEqual(true, result.Success);
+            Assert.AreEqual(44100, result.Left.Length);
         }
     }
 }
