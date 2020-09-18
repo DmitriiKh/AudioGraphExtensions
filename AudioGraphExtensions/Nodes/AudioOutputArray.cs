@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Windows.Media;
+﻿using Windows.Media;
 using Windows.Media.Audio;
 
 namespace AudioGraphExtensions.Nodes
@@ -77,7 +76,7 @@ namespace AudioGraphExtensions.Nodes
 
         public IAudioNode Node => _frameOutputNode;
         
-        public async Task<RunResult> FinalizeAsync()
+        public RunResult Stop()
         {
             return new RunResult(true, _sampleRate, _leftChannel, _rightChannel);
         }

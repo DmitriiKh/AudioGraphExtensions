@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Windows.Media.Audio;
+﻿using Windows.Media.Audio;
 
 namespace AudioGraphExtensions
 {
@@ -7,6 +6,6 @@ namespace AudioGraphExtensions
     {
         public IAudioNode Node { get; }
         
-        public Task<RunResult> FinalizeAsync();
+        RunResult Stop();
     }
 }

@@ -18,8 +18,6 @@ namespace AudioGraphExtensions
         private IAudioInput _audioInput;
         private IAudioOutput _audioOutput;
         private bool _lastFrame;
-        private bool _finalizing;
-        private ulong _n;
 
         public AudioSystem(
             uint sampleRate,
@@ -111,12 +109,6 @@ namespace AudioGraphExtensions
         private void OnLastFrame(object sender, EventArgs e)
         {
             _lastFrame = true;
-
-            _n = _audioGraph.CompletedQuantumCount;
-
-            //_audioGraph.Stop();
-            //_audioInput.Node.Stop();
-            //_audioOutput.Node.Stop();
         }
 
         private async Task<AudioGraph> CreateAudioGraphAsync()
@@ -128,58 +120,28 @@ namespace AudioGraphExtensions
             if (resultGraph.Status != AudioGraphCreationStatus.Success) throw resultGraph.ExtendedError;
 
             resultGraph.Graph.QuantumProcessed += AudioSystem_QuantumProcessed;
-            resultGraph.Graph.QuantumStarted += AudioSystem_QuantumStarted;
 
             return resultGraph.Graph;
-        }
-
-        private void AudioSystem_QuantumStarted(AudioGraph sender, object args)
-        {
-            //if (_lastFrame && !_finalizing)
-            //    _n = _audioGraph.CompletedQuantumCount;
         }
 
         private void AudioSystem_QuantumProcessed(AudioGraph sender, object args)
         {
             if (_lastFrame)
             {
-                if (_finalizing)
-                {
-                    return;
-                }
-
-                _finalizing = true;
-
-                _audioOutput.Node.Stop();
                 _audioGraph.Stop();
-                //_audioInput.Node.Stop();
 
-                var nnn = _n;
+                var result = _audioOutput.Stop();
 
-                FinalizeAsync();
+                _writeFileSuccess.SetResult(result);
+
+                // clean status and progress 
+                _status?.Report("");
+                _progress?.Report(0);
             }
             else
             {
                 ReportProgress();
             }
-        }
-
-        private async void FinalizeAsync()
-        {
-            //if (_finalizing)
-            //{
-            //    return;
-            //}
-
-            //_finalizing = true;
-
-            var result = await _audioOutput.FinalizeAsync();
-
-            _writeFileSuccess.SetResult(result);
-
-            // clean status and progress 
-            _status?.Report("");
-            _progress?.Report(0);
         }
     }
 }
