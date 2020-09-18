@@ -90,6 +90,19 @@ namespace UnitTestProjectMsTest
             Assert.AreEqual(44100, result.Left.Length);
         }
 
+        [TestMethod]
+        public async Task UsingBuilder_AudioSystem_SawToArray()
+        {
+            var builder = AudioSystem.Builder();
+            builder.SampleRate(44100).Channels(1);
+            builder.From(saw);
+
+            var audioSystem = await builder.BuildAsync();
+            var result = await audioSystem.RunAsync();
+
+            Assert.AreEqual(true, result.Success);
+        }
+
         private static float[] GetSquare(int arrayLength, int halfPeriod)
         {
             var square = new float[arrayLength];
