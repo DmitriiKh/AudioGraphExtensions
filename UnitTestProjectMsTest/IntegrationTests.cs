@@ -12,32 +12,18 @@ namespace UnitTestProjectMsTest
     public class IntegrationTests
     {
         private static StorageFolder storageFolder;
+        private static float[] square;
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext context)
         {
             storageFolder = ApplicationData.Current.LocalFolder;
+            square = GetSquare(44100, 4);
         }
 
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SquareToMono()
         {
-            const int arrayLength = 44100;
-            const int halfPeriod = 4;
-
-            var square = new float[arrayLength];
-            var high = true;
-            var currentWidth = 0;
-            for (var index = 0; index < square.Length; index++)
-            {
-                square[index] = high ? 1f : -1f;
-                if (++currentWidth == halfPeriod)
-                {
-                    currentWidth = 0;
-                    high = !high;
-                }
-            }
-
             var outputFile = await storageFolder.CreateFileAsync(
                 "square44100-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
@@ -126,6 +112,24 @@ namespace UnitTestProjectMsTest
 
             Assert.AreEqual(true, result.Success);
             Assert.AreEqual(44100, result.Left.Length);
+        }
+
+        private static float[] GetSquare(int arrayLength, int halfPeriod)
+        {
+            var square = new float[arrayLength];
+            var high = true;
+            var currentWidth = 0;
+            for (var index = 0; index < square.Length; index++)
+            {
+                square[index] = high ? 1f : -1f;
+                if (++currentWidth == halfPeriod)
+                {
+                    currentWidth = 0;
+                    high = !high;
+                }
+            }
+
+            return square;
         }
     }
 }
