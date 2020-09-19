@@ -7,7 +7,7 @@ using AudioGraphExtensions.Nodes;
 
 namespace AudioGraphExtensions
 {
-    public class AudioSystem
+    public class AudioSystem : IDisposable
     {
         private uint _channelCount;
         private uint _sampleRate;
@@ -89,7 +89,12 @@ namespace AudioGraphExtensions
 
             return await _writeFileSuccess.Task;
         }
-        
+
+        public void Dispose()
+        {
+            _audioGraph.Dispose();
+        }
+
         public static AudioSystemBuilder Builder()
         {
             return new AudioSystemBuilder();
@@ -137,7 +142,7 @@ namespace AudioGraphExtensions
 
                 _finalizing = true;
 
-                _audioOutput.Node.Stop();
+                //_audioOutput.Node.Stop();
                 _audioGraph.Stop();
 
                 var result = _audioOutput.Stop();
