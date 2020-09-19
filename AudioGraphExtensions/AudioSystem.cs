@@ -18,6 +18,7 @@ namespace AudioGraphExtensions
         private IAudioInput _audioInput;
         private IAudioOutput _audioOutput;
         private bool _lastFrame;
+        private bool _finalizing;
 
         public AudioSystem(
             uint sampleRate,
@@ -78,6 +79,7 @@ namespace AudioGraphExtensions
         public async Task<RunResult> RunAsync()
         {
             _lastFrame = false;
+            _finalizing = false;
 
             _status?.Report("Working...");
 
@@ -128,6 +130,14 @@ namespace AudioGraphExtensions
         {
             if (_lastFrame)
             {
+                if (_finalizing)
+                {
+                    return;
+                }
+
+                _finalizing = true;
+
+                _audioOutput.Node.Stop();
                 _audioGraph.Stop();
 
                 var result = _audioOutput.Stop();
