@@ -11,6 +11,7 @@ namespace UnitTestProjectMsTest
     [TestClass]
     public class IntegrationTests
     {
+        private const int ArrayLength = 44100;
         private static StorageFolder storageFolder;
         private static float[] square;
         private static float[] saw;
@@ -19,19 +20,19 @@ namespace UnitTestProjectMsTest
         public static void AssemblyInit(TestContext context)
         {
             storageFolder = ApplicationData.Current.LocalFolder;
-            square = GetSquare(44100, 4);
-            saw = GetSaw(44100, 0.25f);
+            square = GetSquare(ArrayLength, 4);
+            saw = GetSaw(ArrayLength, 0.25f);
         }
 
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SquareToMono()
         {
             var outputFile = await storageFolder.CreateFileAsync(
-                "square44100-mono.wav",
+                "square-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(44100).Channels(1);
+            builder.SampleRate(ArrayLength).Channels(1);
             builder.From(square).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -44,11 +45,11 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_SawToMono()
         {
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw44100-mono.wav",
+                "saw-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(44100).Channels(1);
+            builder.SampleRate(ArrayLength).Channels(1);
             builder.From(saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -61,11 +62,11 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_SawToStereo()
         {
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw44100-stereo.wav",
+                "saw-to-stereo.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(44100).Channels(2);
+            builder.SampleRate(ArrayLength).Channels(2);
             builder.From(saw, saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -78,7 +79,7 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_MonoToArray()
         {
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw44100-mono.wav"));
+                Path.Combine(storageFolder.Path, "saw-to-mono.wav"));
 
             var builder = AudioSystem.Builder();
             builder.From(inputFile);
@@ -87,14 +88,14 @@ namespace UnitTestProjectMsTest
             var result = await audioSystem.RunAsync();
 
             Assert.AreEqual(true, result.Success);
-            Assert.AreEqual(44100, result.Left.Length);
+            Assert.AreEqual(ArrayLength, result.Left.Length);
         }
 
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawToArray()
         {
             var builder = AudioSystem.Builder();
-            builder.SampleRate(44100).Channels(1);
+            builder.SampleRate(ArrayLength).Channels(1);
             builder.From(saw);
 
             var audioSystem = await builder.BuildAsync();
@@ -107,10 +108,10 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_MonoToMono()
         {
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw44100-mono.wav"));
+                Path.Combine(storageFolder.Path, "saw-to-mono.wav"));
 
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw44100-mono-to-mono.wav",
+                "saw-to-mono-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
