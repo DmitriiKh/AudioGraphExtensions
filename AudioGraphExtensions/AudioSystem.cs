@@ -20,7 +20,7 @@ namespace AudioGraphExtensions
         private bool _lastFrame;
         private bool _finalizing;
 
-        public AudioSystem(
+        internal AudioSystem(
             uint sampleRate,
             uint channelCount,
             IProgress<double> progress = null,
@@ -35,16 +35,16 @@ namespace AudioGraphExtensions
             _writeFileSuccess = new TaskCompletionSource<RunResult>();
         }
 
-        public int InputLength => _audioInput.LengthInSamples;
+        internal int InputLength => _audioInput.LengthInSamples;
         
-        public bool IsStereo => _channelCount == 2;
+        internal bool IsStereo => _channelCount == 2;
 
-        public async Task InitAsync()
+        internal async Task InitAsync()
         {
             _audioGraph = await CreateAudioGraphAsync();
         }
 
-        public async Task SetInputAsync(StorageFile file)
+        internal async Task SetInputAsync(StorageFile file)
         {
             _audioInput = await AudioInputFile.CreateAsync(file, _audioGraph);
 
@@ -59,19 +59,19 @@ namespace AudioGraphExtensions
             _sampleRate = _audioInput.Node.EncodingProperties.SampleRate;
         }
 
-        public void SetInput(float[] left, float[] right = null)
+        internal void SetInput(float[] left, float[] right = null)
         {
             _audioInput = new AudioInputArray(_audioGraph, _sampleRate, _channelCount, left, right);
 
             _audioInput.InputEnded += OnLastFrame;
         }
 
-        public async Task SetOutputAsync(StorageFile file)
+        internal async Task SetOutputAsync(StorageFile file)
         {
             _audioOutput = await AudioOutputFile.CreateAsync(file, _sampleRate, _channelCount, _audioGraph);
         }
 
-        public void SetOutput(float[] left, float[] right)
+        internal void SetOutput(float[] left, float[] right)
         {
             _audioOutput = new AudioOutputArray(_audioGraph, _sampleRate, _channelCount, left, right);
         }
