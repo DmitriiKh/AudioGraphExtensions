@@ -16,7 +16,7 @@ namespace AudioGraphExtensions
         private AudioGraph _audioGraph;
         private IAudioInput _audioInput;
         private IAudioOutput _audioOutput;
-        private bool _lastFrame;
+        private bool _lastQuantum;
         private bool _finalizing;
 
         internal AudioSystem(
@@ -32,7 +32,7 @@ namespace AudioGraphExtensions
             _runAsyncCompletion = new TaskCompletionSource<RunResult>();
         }
 
-        internal int InputLength => _audioInput.LengthInSamples;
+        internal uint InputLength => _audioInput.LengthInSamples;
 
         internal bool IsStereo => _audioInput.Node.EncodingProperties.ChannelCount == 2;
 
@@ -40,6 +40,15 @@ namespace AudioGraphExtensions
         {
             _audioGraph = await CreateAudioGraphAsync();
             _audioGraph.QuantumProcessed += AudioSystem_QuantumProcessed;
+            _audioGraph.QuantumStarted += AudioSystem_QuantumStarted;
+        }
+
+        private void AudioSystem_QuantumStarted(AudioGraph sender, object args)
+        {
+            if (_audioGraph.CompletedQuantumCount == _audioInput.LengthInQuantum)
+            {
+                _lastQuantum = true;
+            }    
         }
 
         internal async Task SetInputAsync(StorageFile file)
@@ -47,8 +56,6 @@ namespace AudioGraphExtensions
             _audioInput = await AudioInputFile.CreateAsync(file, _audioGraph);
 
             InheritInputSetting();
-
-            _audioInput.InputEnded += OnLastFrame;
         }
 
         private void InheritInputSetting()
@@ -61,8 +68,6 @@ namespace AudioGraphExtensions
             var channelCount = right is null ? 1u : 2u;
 
             _audioInput = new AudioInputArray(_audioGraph, _sampleRate, channelCount, left, right);
-
-            _audioInput.InputEnded += OnLastFrame;
         }
 
         internal async Task SetOutputAsync(StorageFile file)
@@ -81,7 +86,7 @@ namespace AudioGraphExtensions
 
         public async Task<RunResult> RunAsync()
         {
-            _lastFrame = false;
+            _lastQuantum = false;
             _finalizing = false;
 
             _status?.Report("Working...");
@@ -122,11 +127,6 @@ namespace AudioGraphExtensions
             _progress?.Report(dProgress);
         }
 
-        private void OnLastFrame(object sender, EventArgs e)
-        {
-            _lastFrame = true;
-        }
-
         private static async Task<AudioGraph> CreateAudioGraphAsync()
         {
             var mediaSettings = new AudioGraphSettings(AudioRenderCategory.Media);
@@ -140,7 +140,7 @@ namespace AudioGraphExtensions
 
         private void AudioSystem_QuantumProcessed(AudioGraph sender, object args)
         {
-            if (_lastFrame)
+            if (_lastQuantum)
             {
                 if (_finalizing)
                 {

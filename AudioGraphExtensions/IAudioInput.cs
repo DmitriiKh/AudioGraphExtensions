@@ -7,9 +7,9 @@ namespace AudioGraphExtensions
     {
         IAudioInputNode Node { get; }
         
-        int LengthInQuantum { get; }
+        uint LengthInQuantum { get; }
         
-        int LengthInSamples { get; }
+        uint LengthInSamples { get; }
 
         event EventHandler InputEnded;
     }
