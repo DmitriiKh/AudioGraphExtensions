@@ -20,8 +20,10 @@ namespace AudioGraphExtensions.Nodes
 
         public IAudioNode Node => _fileOutputNode;
 
-        public RunResult Stop()
+        public async Task<RunResult> FinalizeAsync()
         {
+            _fileOutputNode.Stop();
+
             var file = _fileOutputNode.File;
 
             var finalizeTask = _fileOutputNode.FinalizeAsync().AsTask();

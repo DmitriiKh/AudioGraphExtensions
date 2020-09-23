@@ -149,21 +149,24 @@ namespace AudioGraphExtensions
 
                 _finalizing = true;
 
-                //_audioOutput.Node.Stop();
                 _audioGraph.Stop();
-
-                var result = _audioOutput.Stop();
-
-                _runAsyncCompletion.SetResult(result);
-
-                // clean status and progress 
-                _status?.Report("");
-                _progress?.Report(0);
+                FinalizeAsync();
             }
             else
             {
                 ReportProgress();
             }
+        }
+
+        private async void FinalizeAsync()
+        {
+            var result = await _audioOutput.FinalizeAsync();
+
+            _runAsyncCompletion.SetResult(result);
+
+            // clean status and progress 
+            _status?.Report("");
+            _progress?.Report(0);
         }
     }
 }
