@@ -114,10 +114,10 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_MonoToMono()
         {
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw-to-mono.wav"));
+                Path.Combine(storageFolder.Path, "saw-array-to-mono.wav"));
 
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw-to-mono-to-mono.wav",
+                "saw-array-to-mono-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
