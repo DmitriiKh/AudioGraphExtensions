@@ -9,12 +9,15 @@ namespace AudioGraphExtensions
     {
         private readonly AudioFileInputNode _fileInputNode;
 
-        private AudioInputFile(AudioFileInputNode fileInputNode, int samplesPerQuantum)
+        private AudioInputFile(AudioFileInputNode fileInputNode)
         {
             _fileInputNode = fileInputNode;
                         
             LengthInSamples =
                 (uint)Math.Ceiling(fileInputNode.EncodingProperties.SampleRate * fileInputNode.Duration.TotalSeconds);
+
+            uint samplesPerQuantum = fileInputNode.EncodingProperties.SampleRate / 100; // each quantum is 10ms
+
             LengthInQuantum = (uint)Math.Ceiling((double)LengthInSamples / samplesPerQuantum);
         }
 
@@ -24,7 +27,7 @@ namespace AudioGraphExtensions
         {
             var inputNode = await CreateAudioFileInputNode(file, graph);
 
-            return new AudioInputFile(inputNode, graph.SamplesPerQuantum);
+            return new AudioInputFile(inputNode);
         }
 
         private static async Task<AudioFileInputNode> CreateAudioFileInputNode(
