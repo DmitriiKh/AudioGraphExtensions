@@ -31,10 +31,10 @@ namespace UnitTestProjectMsTest
         }
 
         [TestMethod]
-        public async Task UsingBuilder_AudioSystem_SquareToMono()
+        public async Task UsingBuilder_AudioSystem_SquareArrayToMono()
         {
             var outputFile = await storageFolder.CreateFileAsync(
-                "square-to-mono.wav",
+                "square-array-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
@@ -48,10 +48,10 @@ namespace UnitTestProjectMsTest
         }
 
         [TestMethod]
-        public async Task UsingBuilder_AudioSystem_SawToMono()
+        public async Task UsingBuilder_AudioSystem_SawArrayToMono()
         {
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw-to-mono.wav",
+                "saw-array-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
@@ -65,10 +65,10 @@ namespace UnitTestProjectMsTest
         }
 
         [TestMethod]
-        public async Task UsingBuilder_AudioSystem_SawToStereo()
+        public async Task UsingBuilder_AudioSystem_SawArrayToStereo()
         {
             var outputFile = await storageFolder.CreateFileAsync(
-                "saw-to-stereo.wav",
+                "saw-array-to-stereo.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
@@ -82,10 +82,10 @@ namespace UnitTestProjectMsTest
         }
 
         [TestMethod]
-        public async Task UsingBuilder_AudioSystem_MonoToArray()
+        public async Task UsingBuilder_AudioSystem_SawMonoToArray()
         {
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw-to-mono.wav"));
+                Path.Combine(storageFolder.Path, "saw-array-to-mono.wav"));
 
             var builder = AudioSystem.Builder();
             builder.From(inputFile);
@@ -98,7 +98,7 @@ namespace UnitTestProjectMsTest
         }
 
         [TestMethod]
-        public async Task UsingBuilder_AudioSystem_SawToArray()
+        public async Task UsingBuilder_AudioSystem_SawArrayToArray()
         {
             var builder = AudioSystem.Builder();
             builder.SampleRate(sampleRate).Channels(1);
