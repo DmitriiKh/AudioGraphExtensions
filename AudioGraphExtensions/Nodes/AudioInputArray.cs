@@ -31,8 +31,6 @@ namespace AudioGraphExtensions.Nodes
         }
 
         public uint LengthInSamples { get; }
-        
-        public event EventHandler InputEnded;
 
         public IAudioInputNode Node => _frameInputNode;
 
@@ -62,19 +60,12 @@ namespace AudioGraphExtensions.Nodes
             if (numSamplesNeeded == 0)
                 return;
 
-            var (frame, finished) = ArrayToFrame(numSamplesNeeded);
+            var frame = ArrayToFrame(numSamplesNeeded);
 
             sender.AddFrame(frame);
-
-            if (finished) OnInputEnd();
         }
 
-        private void OnInputEnd()
-        {
-            InputEnded?.Invoke(this, EventArgs.Empty);
-        }
-
-        private unsafe (AudioFrame frame, bool finished) ArrayToFrame(int requiredSamples)
+        private unsafe AudioFrame ArrayToFrame(int requiredSamples)
         {
             var bufferSize = (uint) (requiredSamples * sizeof(float) * _channelCount);
 
@@ -101,7 +92,7 @@ namespace AudioGraphExtensions.Nodes
                         for (var indexForZeros = index; indexForZeros < capacityInFloat; indexForZeros++)
                             dataInFloat[indexForZeros] = 0;
 
-                        return (frame, true);
+                        return frame;
                     }
 
                     dataInFloat[index] = _leftChannel[_audioCurrentPosition];
@@ -114,7 +105,7 @@ namespace AudioGraphExtensions.Nodes
                 }
             }
 
-            return (frame, false);
+            return frame;
         }
     }
 }

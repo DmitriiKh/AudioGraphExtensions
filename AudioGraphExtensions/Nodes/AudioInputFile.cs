@@ -21,13 +21,6 @@ namespace AudioGraphExtensions
             LengthInSamples =
                 (uint)Math.Ceiling(fileInputNode.EncodingProperties.SampleRate * fileInputNode.Duration.TotalSeconds);
             LengthInQuantum = (uint)Math.Ceiling((double)LengthInSamples / samplesPerQuantum);
-            
-            _fileInputNode.FileCompleted += OnFileCompleted;
-        }
-
-        private void OnFileCompleted(AudioFileInputNode sender, object args)
-        {
-            InputEnded?.Invoke(this, EventArgs.Empty);
         }
 
         public static async Task<AudioInputFile> CreateAsync(
@@ -56,7 +49,5 @@ namespace AudioGraphExtensions
         public IAudioInputNode Node => _fileInputNode;
         public uint LengthInQuantum { get; }
         public uint LengthInSamples { get; }
-
-        public event EventHandler InputEnded;
     }
 }

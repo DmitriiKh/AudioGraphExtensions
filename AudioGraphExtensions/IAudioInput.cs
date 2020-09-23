@@ -10,7 +10,5 @@ namespace AudioGraphExtensions
         uint LengthInQuantum { get; }
         
         uint LengthInSamples { get; }
-
-        event EventHandler InputEnded;
     }
 }
