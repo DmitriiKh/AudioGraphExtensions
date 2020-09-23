@@ -38,17 +38,6 @@ namespace AudioGraphExtensions.Nodes
             uint channelCount,
             AudioGraph graph)
         {
-            var outputNode = await CreateAudioFileOutputNode(file, sampleRate, channelCount, graph);
-
-            return new AudioOutputFile(outputNode);
-        }
-
-        private static async Task<AudioFileOutputNode> CreateAudioFileOutputNode(
-            StorageFile file,
-            uint sampleRate,
-            uint channelCount,
-            AudioGraph graph)
-        {
             var mediaEncodingProfile = CreateMediaEncodingProfile(file);
 
             if (mediaEncodingProfile.Audio != null)
@@ -57,13 +46,11 @@ namespace AudioGraphExtensions.Nodes
                 mediaEncodingProfile.Audio.ChannelCount = channelCount;
             }
 
-            var result = await graph.CreateFileOutputNodeAsync(
-                file,
-                mediaEncodingProfile);
+            var result = await graph.CreateFileOutputNodeAsync(file, mediaEncodingProfile);
 
             if (result.Status != AudioFileNodeCreationStatus.Success) throw result.ExtendedError;
-            
-            return result.FileOutputNode;
+
+            return new AudioOutputFile(result.FileOutputNode);
         }
 
         private static MediaEncodingProfile CreateMediaEncodingProfile(StorageFile file)
