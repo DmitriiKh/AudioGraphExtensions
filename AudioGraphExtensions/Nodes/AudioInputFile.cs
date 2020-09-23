@@ -25,15 +25,6 @@ namespace AudioGraphExtensions
             StorageFile file,
             AudioGraph graph)
         {
-            var inputNode = await CreateAudioFileInputNode(file, graph);
-
-            return new AudioInputFile(inputNode);
-        }
-
-        private static async Task<AudioFileInputNode> CreateAudioFileInputNode(
-            StorageFile file,
-            AudioGraph graph)
-        {
             var result = await graph.CreateFileInputNodeAsync(file);
 
             if (result.Status != AudioFileNodeCreationStatus.Success)
@@ -41,7 +32,7 @@ namespace AudioGraphExtensions
                 throw result.ExtendedError;
             }
 
-            return result.FileInputNode;
+            return new AudioInputFile(result.FileInputNode);
         }
 
         public IAudioInputNode Node => _fileInputNode;
