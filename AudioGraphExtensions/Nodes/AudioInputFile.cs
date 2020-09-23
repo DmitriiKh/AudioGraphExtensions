@@ -8,16 +8,11 @@ namespace AudioGraphExtensions
     public class AudioInputFile : IAudioInput
     {
         private readonly AudioFileInputNode _fileInputNode;
-        private uint _sampleRate;
-        private uint _channelCount;
 
         private AudioInputFile(AudioFileInputNode fileInputNode, int samplesPerQuantum)
         {
             _fileInputNode = fileInputNode;
-            
-            _sampleRate = fileInputNode.EncodingProperties.SampleRate;
-            _channelCount = fileInputNode.EncodingProperties.ChannelCount;
-            
+                        
             LengthInSamples =
                 (uint)Math.Ceiling(fileInputNode.EncodingProperties.SampleRate * fileInputNode.Duration.TotalSeconds);
             LengthInQuantum = (uint)Math.Ceiling((double)LengthInSamples / samplesPerQuantum);

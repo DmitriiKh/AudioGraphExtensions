@@ -7,8 +7,6 @@ namespace AudioGraphExtensions.Nodes
     public class AudioOutputArray : IAudioOutput
     {
         private readonly AudioFrameOutputNode _frameOutputNode;
-        private readonly uint _sampleRate;
-        private readonly uint _channelCount;
         private readonly float[] _leftChannel;
         private readonly float[] _rightChannel;
         private int _audioCurrentPosition;
@@ -20,8 +18,6 @@ namespace AudioGraphExtensions.Nodes
             float[] left,
             float[] right)
         {
-            _sampleRate = sampleRate;
-            _channelCount = channelCount;
             _leftChannel = left;
             _rightChannel = right;
 
@@ -54,8 +50,10 @@ namespace AudioGraphExtensions.Nodes
 
                 var capacityInFloat = capacityInBytes / sizeof(float);
 
+                var channelCount = _rightChannel is null ? 1u : 2u;
+
                 // Transfer audio samples from buffer to audio arrays
-                for (uint index = 0; index < capacityInFloat; index += _channelCount)
+                for (uint index = 0; index < capacityInFloat; index += channelCount)
                 {
                     if (_audioCurrentPosition >= _leftChannel.Length)
                     {
@@ -65,7 +63,7 @@ namespace AudioGraphExtensions.Nodes
                     _leftChannel[_audioCurrentPosition] = dataInFloat[index];
 
                     // if stereo
-                    if (_channelCount == 2)
+                    if (channelCount == 2)
                     {
                         _rightChannel[_audioCurrentPosition] = dataInFloat[index + 1];
                     }
@@ -80,7 +78,10 @@ namespace AudioGraphExtensions.Nodes
         public async Task<RunResult> FinalizeAsync()
         {
             _frameOutputNode.Stop();
-            return new RunResult(true, _sampleRate, _leftChannel, _rightChannel);
+
+            var sampleRate = _frameOutputNode.EncodingProperties.SampleRate;
+
+            return new RunResult(true, sampleRate, _leftChannel, _rightChannel);
         }
     }
 }

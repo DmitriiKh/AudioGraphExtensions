@@ -7,7 +7,6 @@ namespace AudioGraphExtensions.Nodes
     internal sealed class AudioInputArray : IAudioInput
     {
         private readonly AudioFrameInputNode _frameInputNode;
-        private readonly uint _channelCount;
         private readonly float[] _leftChannel;
         private readonly float[] _rightChannel;
         private int _audioCurrentPosition;
@@ -19,7 +18,6 @@ namespace AudioGraphExtensions.Nodes
             float[] left,
             float[] right = null)
         {
-            _channelCount = channelCount;
             _leftChannel = left;
             _rightChannel = right;
 
@@ -67,7 +65,9 @@ namespace AudioGraphExtensions.Nodes
 
         private unsafe AudioFrame ArrayToFrame(int requiredSamples)
         {
-            var bufferSize = (uint) (requiredSamples * sizeof(float) * _channelCount);
+            var channelCount = _rightChannel is null ? 1u : 2u;
+
+            var bufferSize = (uint) (requiredSamples * sizeof(float) * channelCount);
 
             var frame = new AudioFrame(bufferSize);
 
@@ -84,7 +84,7 @@ namespace AudioGraphExtensions.Nodes
 
                 var capacityInFloat = capacityInBytes / sizeof(float);
 
-                for (uint index = 0; index < capacityInFloat; index += _channelCount)
+                for (uint index = 0; index < capacityInFloat; index += channelCount)
                 {
                     if (_audioCurrentPosition >= _leftChannel.Length)
                     {
@@ -98,7 +98,7 @@ namespace AudioGraphExtensions.Nodes
                     dataInFloat[index] = _leftChannel[_audioCurrentPosition];
 
                     // if output is stereo
-                    if (_channelCount == 2 && _rightChannel != null)
+                    if (channelCount == 2 && _rightChannel != null)
                         dataInFloat[index + 1] = _rightChannel[_audioCurrentPosition];
 
                     _audioCurrentPosition++;

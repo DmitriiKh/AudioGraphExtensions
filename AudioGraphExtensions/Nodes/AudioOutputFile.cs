@@ -10,12 +10,10 @@ namespace AudioGraphExtensions.Nodes
     internal sealed class AudioOutputFile : IAudioOutput
     {
         private readonly AudioFileOutputNode _fileOutputNode;
-        private uint _sampleRate;
 
-        private AudioOutputFile(AudioFileOutputNode fileOutputNode, uint sampleRate)
+        private AudioOutputFile(AudioFileOutputNode fileOutputNode)
         {
             _fileOutputNode = fileOutputNode;
-            _sampleRate = sampleRate;
         }
 
         public IAudioNode Node => _fileOutputNode;
@@ -24,13 +22,14 @@ namespace AudioGraphExtensions.Nodes
         {
             _fileOutputNode.Stop();
 
+            var sampleRate = _fileOutputNode.EncodingProperties.SampleRate;
             var file = _fileOutputNode.File;
 
             var finalizeResult = await _fileOutputNode.FinalizeAsync();
 
             bool success = finalizeResult == TranscodeFailureReason.None;
 
-            return new RunResult(success, _sampleRate, file);
+            return new RunResult(success, sampleRate, file);
         }
 
         public static async Task<AudioOutputFile> CreateAsync(
@@ -41,7 +40,7 @@ namespace AudioGraphExtensions.Nodes
         {
             var outputNode = await CreateAudioFileOutputNode(file, sampleRate, channelCount, graph);
 
-            return new AudioOutputFile(outputNode, sampleRate);
+            return new AudioOutputFile(outputNode);
         }
 
         private static async Task<AudioFileOutputNode> CreateAudioFileOutputNode(
