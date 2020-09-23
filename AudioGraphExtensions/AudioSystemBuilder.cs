@@ -8,7 +8,6 @@ namespace AudioGraphExtensions
     {
         private AudioSystem _audioSystem;
         private uint _sampleRate;
-        private uint _channelCount;
         private IProgress<double> _progress;
         private IProgress<string> _status;
         private IData _inputData;
@@ -21,12 +20,6 @@ namespace AudioGraphExtensions
         public AudioSystemBuilder SampleRate(uint sampleRate)
         {
             _sampleRate = sampleRate;
-            return this;
-        }
-
-        public AudioSystemBuilder Channels(uint channelCount)
-        {
-            _channelCount = channelCount;
             return this;
         }
         
@@ -63,7 +56,7 @@ namespace AudioGraphExtensions
 
         public async Task<AudioSystem> BuildAsync()
         {
-            await Init();
+            await InitAsync();
 
             await _inputData.ConnectAsInputAsync(_audioSystem);
 
@@ -81,9 +74,9 @@ namespace AudioGraphExtensions
             return _audioSystem;
         }
 
-        private async Task Init()
+        private async Task InitAsync()
         {
-            _audioSystem = new AudioSystem(_sampleRate, _channelCount, _progress, _status);
+            _audioSystem = new AudioSystem(_sampleRate, _progress, _status);
             await _audioSystem.InitAsync();
         }
 

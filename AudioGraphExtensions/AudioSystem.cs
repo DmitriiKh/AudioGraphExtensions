@@ -9,7 +9,6 @@ namespace AudioGraphExtensions
 {
     public class AudioSystem : IDisposable
     {
-        private uint _channelCount;
         private uint _sampleRate;
         private readonly IProgress<double> _progress;
         private readonly IProgress<string> _status;
@@ -22,12 +21,10 @@ namespace AudioGraphExtensions
 
         internal AudioSystem(
             uint sampleRate,
-            uint channelCount,
             IProgress<double> progress = null,
             IProgress<string> status = null)
         {
             _sampleRate = sampleRate;
-            _channelCount = channelCount;
             _progress = progress;
             _status = status;
 
@@ -36,8 +33,8 @@ namespace AudioGraphExtensions
         }
 
         internal int InputLength => _audioInput.LengthInSamples;
-        
-        internal bool IsStereo => _channelCount == 2;
+
+        internal bool IsStereo => _audioInput.Node.EncodingProperties.ChannelCount == 2;
 
         internal async Task InitAsync()
         {
@@ -56,25 +53,30 @@ namespace AudioGraphExtensions
 
         private void InheritInputSetting()
         {
-            _channelCount = _audioInput.Node.EncodingProperties.ChannelCount;
             _sampleRate = _audioInput.Node.EncodingProperties.SampleRate;
         }
 
         internal void SetInput(float[] left, float[] right = null)
         {
-            _audioInput = new AudioInputArray(_audioGraph, _sampleRate, _channelCount, left, right);
+            var channelCount = right is null ? 1u : 2u;
+
+            _audioInput = new AudioInputArray(_audioGraph, _sampleRate, channelCount, left, right);
 
             _audioInput.InputEnded += OnLastFrame;
         }
 
         internal async Task SetOutputAsync(StorageFile file)
         {
-            _audioOutput = await AudioOutputFile.CreateAsync(file, _sampleRate, _channelCount, _audioGraph);
+            var channelCount = _audioInput.Node.EncodingProperties.ChannelCount;
+
+            _audioOutput = await AudioOutputFile.CreateAsync(file, _sampleRate, channelCount, _audioGraph);
         }
 
-        internal void SetOutput(float[] left, float[] right)
+        internal void SetOutput(float[] left, float[] right = null)
         {
-            _audioOutput = new AudioOutputArray(_audioGraph, _sampleRate, _channelCount, left, right);
+            var channelCount = right is null ? 1u : 2u;
+
+            _audioOutput = new AudioOutputArray(_audioGraph, _sampleRate, channelCount, left, right);
         }
 
         public async Task<RunResult> RunAsync()

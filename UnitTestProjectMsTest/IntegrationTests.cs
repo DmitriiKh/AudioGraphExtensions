@@ -38,7 +38,7 @@ namespace UnitTestProjectMsTest
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate).Channels(1);
+            builder.SampleRate(sampleRate);
             builder.From(square).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -55,7 +55,7 @@ namespace UnitTestProjectMsTest
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate).Channels(1);
+            builder.SampleRate(sampleRate);
             builder.From(saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -72,7 +72,7 @@ namespace UnitTestProjectMsTest
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate).Channels(2);
+            builder.SampleRate(sampleRate);
             builder.From(saw, saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -101,7 +101,7 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_SawArrayToArray()
         {
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate).Channels(1);
+            builder.SampleRate(sampleRate);
             builder.From(saw);
 
             var audioSystem = await builder.BuildAsync();
