@@ -26,9 +26,7 @@ namespace AudioGraphExtensions.Nodes
 
             var file = _fileOutputNode.File;
 
-            var finalizeTask = _fileOutputNode.FinalizeAsync().AsTask();
-
-            var finalizeResult = finalizeTask.GetAwaiter().GetResult();
+            var finalizeResult = await _fileOutputNode.FinalizeAsync();
 
             bool success = finalizeResult == TranscodeFailureReason.None;
 
