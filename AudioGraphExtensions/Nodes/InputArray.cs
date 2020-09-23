@@ -4,14 +4,14 @@ using Windows.Media.Audio;
 
 namespace AudioGraphExtensions.Nodes
 {
-    internal sealed class AudioInputArray : IAudioInput
+    internal sealed class InputArray : IAudioInput
     {
         private readonly AudioFrameInputNode _frameInputNode;
         private readonly float[] _leftChannel;
         private readonly float[] _rightChannel;
         private int _audioCurrentPosition;
 
-        public AudioInputArray(
+        public InputArray(
             AudioGraph graph,
             uint sampleRate,
             uint channelCount,

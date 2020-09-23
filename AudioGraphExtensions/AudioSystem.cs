@@ -53,7 +53,7 @@ namespace AudioGraphExtensions
 
         internal async Task SetInputAsync(StorageFile file)
         {
-            _audioInput = await AudioInputFile.CreateAsync(file, _audioGraph);
+            _audioInput = await InputFile.CreateAsync(file, _audioGraph);
 
             InheritInputSetting();
         }
@@ -67,21 +67,21 @@ namespace AudioGraphExtensions
         {
             var channelCount = right is null ? 1u : 2u;
 
-            _audioInput = new AudioInputArray(_audioGraph, _sampleRate, channelCount, left, right);
+            _audioInput = new InputArray(_audioGraph, _sampleRate, channelCount, left, right);
         }
 
         internal async Task SetOutputAsync(StorageFile file)
         {
             var channelCount = _audioInput.Node.EncodingProperties.ChannelCount;
 
-            _audioOutput = await AudioOutputFile.CreateAsync(file, _sampleRate, channelCount, _audioGraph);
+            _audioOutput = await OutputFile.CreateAsync(file, _sampleRate, channelCount, _audioGraph);
         }
 
         internal void SetOutput(float[] left, float[] right = null)
         {
             var channelCount = right is null ? 1u : 2u;
 
-            _audioOutput = new AudioOutputArray(_audioGraph, _sampleRate, channelCount, left, right);
+            _audioOutput = new OutputArray(_audioGraph, _sampleRate, channelCount, left, right);
         }
 
         public async Task<RunResult> RunAsync()

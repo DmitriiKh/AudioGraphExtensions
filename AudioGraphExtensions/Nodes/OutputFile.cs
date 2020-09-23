@@ -7,11 +7,11 @@ using Windows.Storage;
 
 namespace AudioGraphExtensions.Nodes
 {
-    internal sealed class AudioOutputFile : IAudioOutput
+    internal sealed class OutputFile : IAudioOutput
     {
         private readonly AudioFileOutputNode _fileOutputNode;
 
-        private AudioOutputFile(AudioFileOutputNode fileOutputNode)
+        private OutputFile(AudioFileOutputNode fileOutputNode)
         {
             _fileOutputNode = fileOutputNode;
         }
@@ -32,7 +32,7 @@ namespace AudioGraphExtensions.Nodes
             return new RunResult(success, sampleRate, file);
         }
 
-        public static async Task<AudioOutputFile> CreateAsync(
+        public static async Task<OutputFile> CreateAsync(
             StorageFile file,
             uint sampleRate,
             uint channelCount,
@@ -50,7 +50,7 @@ namespace AudioGraphExtensions.Nodes
 
             if (result.Status != AudioFileNodeCreationStatus.Success) throw result.ExtendedError;
 
-            return new AudioOutputFile(result.FileOutputNode);
+            return new OutputFile(result.FileOutputNode);
         }
 
         private static MediaEncodingProfile CreateMediaEncodingProfile(StorageFile file)

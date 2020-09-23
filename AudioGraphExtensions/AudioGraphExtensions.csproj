@@ -127,10 +127,10 @@
     <Compile Include="IAudioInput.cs" />
     <Compile Include="IAudioOutput.cs" />
     <Compile Include="IMemoryBufferByteAccess.cs" />
-    <Compile Include="Nodes\AudioInputArray.cs" />
-    <Compile Include="Nodes\AudioInputFile.cs" />
-    <Compile Include="Nodes\AudioOutputArray.cs" />
-    <Compile Include="Nodes\AudioOutputFile.cs" />
+    <Compile Include="Nodes\InputArray.cs" />
+    <Compile Include="Nodes\InputFile.cs" />
+    <Compile Include="Nodes\OutputArray.cs" />
+    <Compile Include="Nodes\OutputFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunResult.cs" />
     <EmbeddedResource Include="Properties\AudioGraphExtensions.rd.xml" />

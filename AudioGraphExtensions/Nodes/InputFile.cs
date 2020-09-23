@@ -5,11 +5,11 @@ using Windows.Storage;
 
 namespace AudioGraphExtensions
 {
-    public class AudioInputFile : IAudioInput
+    public class InputFile : IAudioInput
     {
         private readonly AudioFileInputNode _fileInputNode;
 
-        private AudioInputFile(AudioFileInputNode fileInputNode)
+        private InputFile(AudioFileInputNode fileInputNode)
         {
             _fileInputNode = fileInputNode;
                         
@@ -21,7 +21,7 @@ namespace AudioGraphExtensions
             LengthInQuantum = (uint)Math.Ceiling((double)LengthInSamples / samplesPerQuantum);
         }
 
-        public static async Task<AudioInputFile> CreateAsync(
+        public static async Task<InputFile> CreateAsync(
             StorageFile file,
             AudioGraph graph)
         {
@@ -32,7 +32,7 @@ namespace AudioGraphExtensions
                 throw result.ExtendedError;
             }
 
-            return new AudioInputFile(result.FileInputNode);
+            return new InputFile(result.FileInputNode);
         }
 
         public IAudioInputNode Node => _fileInputNode;
