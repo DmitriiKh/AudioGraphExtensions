@@ -11,17 +11,23 @@ namespace UnitTestProjectMsTest
     [TestClass]
     public class IntegrationTests
     {
-        private const int ArrayLength = 44100;
+        private static uint sampleRate;
         private static StorageFolder storageFolder;
         private static float[] square;
         private static float[] saw;
 
         [AssemblyInitialize]
-        public static void AssemblyInit(TestContext context)
+        public static async Task AssemblyInit(TestContext context)
         {
+            const int quantumsPerSecond = 100;
+            var defaultQuantumSize = await AudioSystem.GetDefaultQuantumSizeAsync();
+            sampleRate = quantumsPerSecond * (uint)defaultQuantumSize;
+
             storageFolder = ApplicationData.Current.LocalFolder;
-            square = GetSquare(ArrayLength, 4);
-            saw = GetSaw(ArrayLength, 0.25f);
+
+            var oneSecondLong = (int)sampleRate;
+            square = GetSquare(oneSecondLong, 4);
+            saw = GetSaw(oneSecondLong, 0.25f);
         }
 
         [TestMethod]
@@ -32,7 +38,7 @@ namespace UnitTestProjectMsTest
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(ArrayLength).Channels(1);
+            builder.SampleRate(sampleRate).Channels(1);
             builder.From(square).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -49,7 +55,7 @@ namespace UnitTestProjectMsTest
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(ArrayLength).Channels(1);
+            builder.SampleRate(sampleRate).Channels(1);
             builder.From(saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -66,7 +72,7 @@ namespace UnitTestProjectMsTest
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(ArrayLength).Channels(2);
+            builder.SampleRate(sampleRate).Channels(2);
             builder.From(saw, saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
@@ -88,14 +94,14 @@ namespace UnitTestProjectMsTest
             var result = await audioSystem.RunAsync();
 
             Assert.AreEqual(true, result.Success);
-            Assert.AreEqual(ArrayLength, result.Left.Length);
+            Assert.AreEqual(saw.Length, result.Left.Length);
         }
 
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawToArray()
         {
             var builder = AudioSystem.Builder();
-            builder.SampleRate(ArrayLength).Channels(1);
+            builder.SampleRate(sampleRate).Channels(1);
             builder.From(saw);
 
             var audioSystem = await builder.BuildAsync();

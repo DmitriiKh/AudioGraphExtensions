@@ -42,6 +42,7 @@ namespace AudioGraphExtensions
         internal async Task InitAsync()
         {
             _audioGraph = await CreateAudioGraphAsync();
+            _audioGraph.QuantumProcessed += AudioSystem_QuantumProcessed;
         }
 
         internal async Task SetInputAsync(StorageFile file)
@@ -100,6 +101,12 @@ namespace AudioGraphExtensions
             return new AudioSystemBuilder();
         }
 
+        public static async Task<int> GetDefaultQuantumSizeAsync()
+        {
+            var graph = await CreateAudioGraphAsync();
+            return graph.SamplesPerQuantum;
+        }
+
         private void ReportProgress()
         {
             //to not report too many times
@@ -118,15 +125,13 @@ namespace AudioGraphExtensions
             _lastFrame = true;
         }
 
-        private async Task<AudioGraph> CreateAudioGraphAsync()
+        private static async Task<AudioGraph> CreateAudioGraphAsync()
         {
             var mediaSettings = new AudioGraphSettings(AudioRenderCategory.Media);
 
             var resultGraph = await AudioGraph.CreateAsync(mediaSettings);
 
             if (resultGraph.Status != AudioGraphCreationStatus.Success) throw resultGraph.ExtendedError;
-
-            resultGraph.Graph.QuantumProcessed += AudioSystem_QuantumProcessed;
 
             return resultGraph.Graph;
         }
