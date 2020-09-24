@@ -1,6 +1,10 @@
 ﻿
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime;
 using System.Threading.Tasks;
 using AudioGraphExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -127,6 +131,66 @@ namespace UnitTestProjectMsTest
             var result = await audioSystem.RunAsync();
 
             Assert.AreEqual(true, result.Success);
+        }
+
+        [TestMethod]
+        public async Task UsingBuilder_AudioSystem_Stress()
+        {
+            var lengthSeconds = 10;
+            var longSaw = GetSaw(lengthSeconds * (int)sampleRate, 0.25f);
+
+            const int executeTimes = 10;
+            for (var count = 0; count < executeTimes; count++)
+            {
+                // Write
+                var outputFile = await storageFolder.CreateFileAsync(
+                    "stress.wav",
+                    CreationCollisionOption.ReplaceExisting);
+
+                var builderWrite = AudioSystem.Builder();
+                builderWrite.SampleRate(sampleRate);
+                builderWrite.From(longSaw).To(outputFile);
+
+                var audioSystemWrite = await builderWrite.BuildAsync();
+                var resultWrite = await audioSystemWrite.RunAsync();
+                audioSystemWrite.Dispose();
+
+                Assert.AreEqual(true, resultWrite.Success, "Error while writing");
+
+                // Read
+                var inputFile = await StorageFile.GetFileFromPathAsync(
+                Path.Combine(storageFolder.Path, "stress.wav"));
+
+                var builderRead = AudioSystem.Builder();
+                builderRead.From(inputFile);
+
+                var audioSystemRead = await builderRead.BuildAsync();
+                var resultRead = await audioSystemRead.RunAsync();
+                audioSystemRead.Dispose();
+
+                Assert.AreEqual(true, resultRead.Success, "Error while reading");
+                Assert.AreEqual(longSaw.Length, resultRead.Left.Length, "Successful runs: " + count);
+                CollectionAssert.AreEqual(longSaw, resultRead.Left, new SampleComparer(0.0001f), "Successful runs: " + count);
+            }
+        }
+        
+
+        class SampleComparer : IComparer
+        {
+            private readonly float tolerance;
+
+            public SampleComparer(float tolerance)
+            {
+                this.tolerance = tolerance;
+            }
+
+            public int Compare(object x, object y)
+            {
+                if (Math.Abs((float)x - (float)y) <= tolerance)
+                    return 0;
+                else 
+                    return 1;
+            }
         }
 
         private static float[] GetSquare(int arrayLength, int halfPeriod)
