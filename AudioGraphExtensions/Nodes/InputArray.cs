@@ -57,7 +57,7 @@ namespace AudioGraphExtensions.Nodes
         {
             var numSamplesNeeded = args.RequiredSamples;
 
-            if (numSamplesNeeded == 0)
+            if (numSamplesNeeded == 0 || _audioCurrentPosition >= _leftChannel.Length)
                 return;
 
             var frame = ArrayToFrame(numSamplesNeeded);
