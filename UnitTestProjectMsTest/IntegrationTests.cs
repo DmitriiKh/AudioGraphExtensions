@@ -12,35 +12,35 @@ namespace UnitTestProjectMsTest
     [TestClass]
     public class IntegrationTests
     {
-        private static uint sampleRate;
-        private static StorageFolder storageFolder;
-        private static float[] square;
-        private static float[] saw;
+        private static uint _sampleRate;
+        private static StorageFolder _storageFolder;
+        private static float[] _square;
+        private static float[] _saw;
 
         [AssemblyInitialize]
         public static async Task AssemblyInit(TestContext context)
         {
-            const int quantumsPerSecond = 100;
+            const int quantumPerSecond = 100;
             var defaultQuantumSize = await AudioSystem.GetDefaultQuantumSizeAsync();
-            sampleRate = quantumsPerSecond * (uint)defaultQuantumSize;
+            _sampleRate = quantumPerSecond * (uint)defaultQuantumSize;
 
-            storageFolder = ApplicationData.Current.LocalFolder;
+            _storageFolder = ApplicationData.Current.LocalFolder;
 
-            var oneSecondLong = (int)sampleRate;
-            square = GetSquare(oneSecondLong, 4);
-            saw = GetSaw(oneSecondLong, 0.25f);
+            var oneSecondLong = (int)_sampleRate;
+            _square = GetSquare(oneSecondLong, 4);
+            _saw = GetSaw(oneSecondLong, 0.25f);
         }
 
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SquareArrayToMono()
         {
-            var outputFile = await storageFolder.CreateFileAsync(
+            var outputFile = await _storageFolder.CreateFileAsync(
                 "square-array-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate);
-            builder.From(square).To(outputFile);
+            builder.SampleRate(_sampleRate);
+            builder.From(_square).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
             var result = await audioSystem.RunAsync();
@@ -51,13 +51,13 @@ namespace UnitTestProjectMsTest
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawArrayToMono()
         {
-            var outputFile = await storageFolder.CreateFileAsync(
+            var outputFile = await _storageFolder.CreateFileAsync(
                 "saw-array-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate);
-            builder.From(saw).To(outputFile);
+            builder.SampleRate(_sampleRate);
+            builder.From(_saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
             var result = await audioSystem.RunAsync();
@@ -68,13 +68,13 @@ namespace UnitTestProjectMsTest
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawArrayToStereo()
         {
-            var outputFile = await storageFolder.CreateFileAsync(
+            var outputFile = await _storageFolder.CreateFileAsync(
                 "saw-array-to-stereo.wav",
                 CreationCollisionOption.ReplaceExisting);
 
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate);
-            builder.From(saw, saw).To(outputFile);
+            builder.SampleRate(_sampleRate);
+            builder.From(_saw, _saw).To(outputFile);
 
             var audioSystem = await builder.BuildAsync();
             var result = await audioSystem.RunAsync();
@@ -86,7 +86,7 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_SawMonoToArray()
         {
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw-array-to-mono.wav"));
+                Path.Combine(_storageFolder.Path, "saw-array-to-mono.wav"));
 
             var builder = AudioSystem.Builder();
             builder.From(inputFile);
@@ -95,15 +95,15 @@ namespace UnitTestProjectMsTest
             var result = await audioSystem.RunAsync();
 
             Assert.AreEqual(true, result.Success);
-            Assert.AreEqual(saw.Length, result.Left.Length);
+            Assert.AreEqual(_saw.Length, result.Left.Length);
         }
 
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_SawArrayToArray()
         {
             var builder = AudioSystem.Builder();
-            builder.SampleRate(sampleRate);
-            builder.From(saw);
+            builder.SampleRate(_sampleRate);
+            builder.From(_saw);
 
             var audioSystem = await builder.BuildAsync();
             var result = await audioSystem.RunAsync();
@@ -115,9 +115,9 @@ namespace UnitTestProjectMsTest
         public async Task UsingBuilder_AudioSystem_MonoToMono()
         {
             var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "saw-array-to-mono.wav"));
+                Path.Combine(_storageFolder.Path, "saw-array-to-mono.wav"));
 
-            var outputFile = await storageFolder.CreateFileAsync(
+            var outputFile = await _storageFolder.CreateFileAsync(
                 "saw-array-to-mono-to-mono.wav",
                 CreationCollisionOption.ReplaceExisting);
 
@@ -133,19 +133,19 @@ namespace UnitTestProjectMsTest
         [TestMethod]
         public async Task UsingBuilder_AudioSystem_Stress()
         {
-            var lengthSeconds = 10;
-            var longSaw = GetSaw(lengthSeconds * (int)sampleRate, 0.25f);
+            const int lengthSeconds = 10;
+            var longSaw = GetSaw(lengthSeconds * (int)_sampleRate, 0.25f);
 
             const int executeTimes = 10;
             for (var count = 0; count < executeTimes; count++)
             {
                 // Write
-                var outputFile = await storageFolder.CreateFileAsync(
+                var outputFile = await _storageFolder.CreateFileAsync(
                     "stress.wav",
                     CreationCollisionOption.ReplaceExisting);
 
                 var builderWrite = AudioSystem.Builder();
-                builderWrite.SampleRate(sampleRate);
+                builderWrite.SampleRate(_sampleRate);
                 builderWrite.From(longSaw).To(outputFile);
 
                 var audioSystemWrite = await builderWrite.BuildAsync();
@@ -156,7 +156,7 @@ namespace UnitTestProjectMsTest
 
                 // Read
                 var inputFile = await StorageFile.GetFileFromPathAsync(
-                Path.Combine(storageFolder.Path, "stress.wav"));
+                Path.Combine(_storageFolder.Path, "stress.wav"));
 
                 var builderRead = AudioSystem.Builder();
                 builderRead.From(inputFile);
@@ -170,57 +170,54 @@ namespace UnitTestProjectMsTest
                 CollectionAssert.AreEqual(longSaw, resultRead.Left, new SampleComparer(0.0001f), "Successful runs: " + count);
             }
         }
-        
 
-        class SampleComparer : IComparer
+
+        private class SampleComparer : IComparer
         {
-            private readonly float tolerance;
+            private readonly float _tolerance;
 
             public SampleComparer(float tolerance)
             {
-                this.tolerance = tolerance;
+                _tolerance = tolerance;
             }
 
             public int Compare(object x, object y)
             {
-                if (Math.Abs((float)x - (float)y) <= tolerance)
-                    return 0;
-                else 
-                    return 1;
+                return Math.Abs((float)x - (float)y) <= _tolerance ? 0 : 1;
             }
         }
 
         private static float[] GetSquare(int arrayLength, int halfPeriod)
         {
-            var square = new float[arrayLength];
+            var squareSamples = new float[arrayLength];
             var high = true;
             var currentWidth = 0;
-            for (var index = 0; index < square.Length; index++)
+            for (var index = 0; index < squareSamples.Length; index++)
             {
-                square[index] = high ? 1f : -1f;
-                if (++currentWidth == halfPeriod)
-                {
-                    currentWidth = 0;
-                    high = !high;
-                }
+                squareSamples[index] = high ? 1f : -1f;
+
+                if (++currentWidth != halfPeriod) continue;
+                
+                currentWidth = 0;
+                high = !high;
             }
 
-            return square;
+            return squareSamples;
         }
 
         private static float[] GetSaw(int arrayLength, float step)
         {
-            var saw = new float[arrayLength];
+            var sawSamples = new float[arrayLength];
             var current = 0f;
-            for (var index = 0; index < saw.Length; index++)
+            for (var index = 0; index < sawSamples.Length; index++)
             {
-                saw[index] = current;
+                sawSamples[index] = current;
                 current += step;
 
                 if (current >= 1 || current <= -1) step = -step;
             }
 
-            return saw;
+            return sawSamples;
         }
     }
 }
