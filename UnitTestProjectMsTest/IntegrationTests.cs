@@ -18,7 +18,7 @@ namespace UnitTestProjectMsTest
         private static float[] _saw;
 
         [AssemblyInitialize]
-        public static async Task AssemblyInit(TestContext context)
+        public static async Task AssemblyInit()
         {
             const int quantumPerSecond = 100;
             var defaultQuantumSize = await AudioSystem.GetDefaultQuantumSizeAsync();
