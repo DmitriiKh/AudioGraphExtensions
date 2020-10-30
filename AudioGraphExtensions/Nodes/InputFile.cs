@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Windows.Media.Audio;
 using Windows.Storage;
 
-namespace AudioGraphExtensions
+namespace AudioGraphExtensions.Nodes
 {
     public class InputFile : IAudioInput
     {
