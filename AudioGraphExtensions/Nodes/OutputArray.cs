@@ -75,13 +75,13 @@ namespace AudioGraphExtensions.Nodes
 
         public IAudioNode Node => _frameOutputNode;
         
-        public async Task<RunResult> Finalize()
+        public Task<RunResult> Finalize()
         {
             _frameOutputNode.Stop();
 
             var sampleRate = _frameOutputNode.EncodingProperties.SampleRate;
 
-            return new RunResult(true, sampleRate, _leftChannel, _rightChannel);
+            return Task.FromResult(new RunResult(true, sampleRate, _leftChannel, _rightChannel));
         }
     }
 }
