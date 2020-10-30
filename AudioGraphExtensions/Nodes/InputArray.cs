@@ -23,7 +23,7 @@ namespace AudioGraphExtensions.Nodes
 
             LengthInSamples = (uint)left.Length;
 
-            uint samplesPerQuantum = sampleRate / 100; // each quantum is 10ms
+            var samplesPerQuantum = sampleRate / 100; // each quantum is 10ms
             LengthInQuantum = (uint)Math.Ceiling((double)left.Length / samplesPerQuantum);
 
             _frameInputNode = CreateAudioFrameInputNode(sampleRate, channelCount, graph);

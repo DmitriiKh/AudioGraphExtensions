@@ -16,7 +16,7 @@ namespace AudioGraphExtensions
             LengthInSamples =
                 (uint)Math.Ceiling(fileInputNode.EncodingProperties.SampleRate * fileInputNode.Duration.TotalSeconds);
 
-            uint samplesPerQuantum = fileInputNode.EncodingProperties.SampleRate / 100; // each quantum is 10ms
+            var samplesPerQuantum = fileInputNode.EncodingProperties.SampleRate / 100; // each quantum is 10ms
 
             LengthInQuantum = (uint)Math.Ceiling((double)LengthInSamples / samplesPerQuantum);
         }
