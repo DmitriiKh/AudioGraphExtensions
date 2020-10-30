@@ -73,38 +73,36 @@ namespace AudioGraphExtensions.Nodes
 
             var frame = new AudioFrame(bufferSize);
 
-            using (var buffer = frame.LockBuffer(AudioBufferAccessMode.Write))
-            using (var reference = buffer.CreateReference())
+            using var buffer = frame.LockBuffer(AudioBufferAccessMode.Write);
+            using var reference = buffer.CreateReference();
+            // Get the buffer from the AudioFrame
+            (reference as IMemoryBufferByteAccess).GetBuffer(
+                out var dataInBytes,
+                out var capacityInBytes);
+
+            // Cast to float since the data we are generating is float
+            var dataInFloat = (float*) dataInBytes;
+
+            var capacityInFloat = capacityInBytes / sizeof(float);
+
+            for (uint index = 0; index < capacityInFloat; index += channelCount)
             {
-                // Get the buffer from the AudioFrame
-                (reference as IMemoryBufferByteAccess).GetBuffer(
-                    out var dataInBytes,
-                    out var capacityInBytes);
-
-                // Cast to float since the data we are generating is float
-                var dataInFloat = (float*) dataInBytes;
-
-                var capacityInFloat = capacityInBytes / sizeof(float);
-
-                for (uint index = 0; index < capacityInFloat; index += channelCount)
+                if (_audioCurrentPosition >= _leftChannel.Length)
                 {
-                    if (_audioCurrentPosition >= _leftChannel.Length)
-                    {
-                        // fill the rest with zeros
-                        for (var indexForZeros = index; indexForZeros < capacityInFloat; indexForZeros++)
-                            dataInFloat[indexForZeros] = 0;
+                    // fill the rest with zeros
+                    for (var indexForZeros = index; indexForZeros < capacityInFloat; indexForZeros++)
+                        dataInFloat[indexForZeros] = 0;
 
-                        return frame;
-                    }
-
-                    dataInFloat[index] = _leftChannel[_audioCurrentPosition];
-
-                    // if output is stereo
-                    if (channelCount == 2 && _rightChannel != null)
-                        dataInFloat[index + 1] = _rightChannel[_audioCurrentPosition];
-
-                    _audioCurrentPosition++;
+                    return frame;
                 }
+
+                dataInFloat[index] = _leftChannel[_audioCurrentPosition];
+
+                // if output is stereo
+                if (channelCount == 2 && _rightChannel != null)
+                    dataInFloat[index + 1] = _rightChannel[_audioCurrentPosition];
+
+                _audioCurrentPosition++;
             }
 
             return frame;

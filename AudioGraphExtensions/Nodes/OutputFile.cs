@@ -53,7 +53,7 @@ namespace AudioGraphExtensions.Nodes
             return new OutputFile(result.FileOutputNode);
         }
 
-        private static MediaEncodingProfile CreateMediaEncodingProfile(StorageFile file)
+        private static MediaEncodingProfile CreateMediaEncodingProfile(IStorageFile file)
         {
             return file.FileType.ToLowerInvariant() switch
             {
