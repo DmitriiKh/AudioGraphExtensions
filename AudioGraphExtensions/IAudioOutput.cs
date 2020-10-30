@@ -7,6 +7,6 @@ namespace AudioGraphExtensions
     {
         public IAudioNode Node { get; }
         
-        public Task<RunResult> FinalizeAsync();
+        public Task<RunResult> Finalize();
     }
 }

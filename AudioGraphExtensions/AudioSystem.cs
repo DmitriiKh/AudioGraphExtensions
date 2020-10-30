@@ -160,7 +160,7 @@ namespace AudioGraphExtensions
 
         private async void FinalizeAsync()
         {
-            var result = await _audioOutput.FinalizeAsync();
+            var result = await _audioOutput.Finalize();
 
             _runAsyncCompletion.SetResult(result);
 

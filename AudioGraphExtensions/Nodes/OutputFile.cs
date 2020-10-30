@@ -18,7 +18,7 @@ namespace AudioGraphExtensions.Nodes
 
         public IAudioNode Node => _fileOutputNode;
 
-        public async Task<RunResult> FinalizeAsync()
+        public async Task<RunResult> Finalize()
         {
             _fileOutputNode.Stop();
 
@@ -27,7 +27,7 @@ namespace AudioGraphExtensions.Nodes
 
             var finalizeResult = await _fileOutputNode.FinalizeAsync();
 
-            var success = finalizeResult == TranscodeFailureReason.None;
+            bool success = finalizeResult == TranscodeFailureReason.None;
 
             return new RunResult(success, sampleRate, file);
         }
@@ -53,7 +53,7 @@ namespace AudioGraphExtensions.Nodes
             return new OutputFile(result.FileOutputNode);
         }
 
-        private static MediaEncodingProfile CreateMediaEncodingProfile(IStorageFile file)
+        private static MediaEncodingProfile CreateMediaEncodingProfile(StorageFile file)
         {
             return file.FileType.ToLowerInvariant() switch
             {
