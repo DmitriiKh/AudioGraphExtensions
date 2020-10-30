@@ -37,39 +37,37 @@ namespace AudioGraphExtensions.Nodes
         
         private unsafe void FrameToArray(AudioFrame frame)
         {
-            using (var buffer = frame.LockBuffer(AudioBufferAccessMode.Read))
-            using (var reference = buffer.CreateReference())
+            using var buffer = frame.LockBuffer(AudioBufferAccessMode.Read);
+            using var reference = buffer.CreateReference();
+            // Get data from current buffer
+            (reference as IMemoryBufferByteAccess).GetBuffer(
+                out var dataInBytes,
+                out var capacityInBytes
+            );
+
+            var dataInFloat = (float*)dataInBytes;
+
+            var capacityInFloat = capacityInBytes / sizeof(float);
+
+            var channelCount = _rightChannel is null ? 1u : 2u;
+
+            // Transfer audio samples from buffer to audio arrays
+            for (uint index = 0; index < capacityInFloat; index += channelCount)
             {
-                // Get data from current buffer
-                (reference as IMemoryBufferByteAccess).GetBuffer(
-                    out var dataInBytes,
-                    out var capacityInBytes
-                );
-
-                var dataInFloat = (float*) dataInBytes;
-
-                var capacityInFloat = capacityInBytes / sizeof(float);
-
-                var channelCount = _rightChannel is null ? 1u : 2u;
-
-                // Transfer audio samples from buffer to audio arrays
-                for (uint index = 0; index < capacityInFloat; index += channelCount)
+                if (_audioCurrentPosition >= _leftChannel.Length)
                 {
-                    if (_audioCurrentPosition >= _leftChannel.Length)
-                    {
-                        break;
-                    }
-
-                    _leftChannel[_audioCurrentPosition] = dataInFloat[index];
-
-                    // if stereo
-                    if (channelCount == 2)
-                    {
-                        _rightChannel[_audioCurrentPosition] = dataInFloat[index + 1];
-                    }
-
-                    _audioCurrentPosition++;
+                    break;
                 }
+
+                _leftChannel[_audioCurrentPosition] = dataInFloat[index];
+
+                // if stereo
+                if (channelCount == 2)
+                {
+                    _rightChannel[_audioCurrentPosition] = dataInFloat[index + 1];
+                }
+
+                _audioCurrentPosition++;
             }
         }
 
