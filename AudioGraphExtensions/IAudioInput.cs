@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.Media.Audio;
+﻿using Windows.Media.Audio;
 
 namespace AudioGraphExtensions
 {
