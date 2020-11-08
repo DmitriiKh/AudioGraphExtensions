@@ -34,7 +34,7 @@ namespace AudioGraphExtensions
 
         internal uint InputLength => _audioInput.LengthInSamples;
 
-        internal bool IsStereo => _audioInput.Node.EncodingProperties.ChannelCount == 2;
+        public bool IsStereo => _audioInput.Node.EncodingProperties.ChannelCount == 2;
 
         internal async Task InitAsync()
         {
