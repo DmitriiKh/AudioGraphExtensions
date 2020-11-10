@@ -33,7 +33,7 @@ namespace AudioGraphExtensions.Nodes
         }
 
         public static async Task<OutputFile> CreateAsync(
-            StorageFile file,
+            IStorageFile file,
             uint sampleRate,
             uint channelCount,
             AudioGraph graph)
@@ -53,7 +53,7 @@ namespace AudioGraphExtensions.Nodes
             return new OutputFile(result.FileOutputNode);
         }
 
-        private static MediaEncodingProfile CreateMediaEncodingProfile(StorageFile file)
+        private static MediaEncodingProfile CreateMediaEncodingProfile(IStorageFile file)
         {
             return file.FileType.ToLowerInvariant() switch
             {

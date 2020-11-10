@@ -51,7 +51,7 @@ namespace AudioGraphExtensions
             }    
         }
 
-        internal async Task SetInputAsync(StorageFile file)
+        internal async Task SetInputAsync(IStorageFile file)
         {
             _audioInput = await InputFile.CreateAsync(file, _audioGraph);
 
@@ -70,7 +70,7 @@ namespace AudioGraphExtensions
             _audioInput = new InputArray(_audioGraph, _sampleRate, channelCount, left, right);
         }
 
-        internal async Task SetOutputAsync(StorageFile file)
+        internal async Task SetOutputAsync(IStorageFile file)
         {
             var channelCount = _audioInput.Node.EncodingProperties.ChannelCount;
 

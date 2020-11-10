@@ -22,7 +22,7 @@ namespace AudioGraphExtensions.Nodes
         }
 
         public static async Task<InputFile> CreateAsync(
-            StorageFile file,
+            IStorageFile file,
             AudioGraph graph)
         {
             var result = await graph.CreateFileInputNodeAsync(file);

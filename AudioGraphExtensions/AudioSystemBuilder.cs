@@ -30,7 +30,7 @@ namespace AudioGraphExtensions
             return this;
         }
 
-        public AudioSystemBuilder From(StorageFile file)
+        public AudioSystemBuilder From(IStorageFile file)
         {
             _inputData = new FileData(file);
             return this;
@@ -42,7 +42,7 @@ namespace AudioGraphExtensions
             return this;
         }
 
-        public AudioSystemBuilder To(StorageFile file)
+        public AudioSystemBuilder To(IStorageFile file)
         {
             _outputData = new FileData(file);
             return this;
@@ -106,9 +106,9 @@ namespace AudioGraphExtensions
         
         private sealed class FileData : IData
         {
-            private readonly StorageFile _file;
+            private readonly IStorageFile _file;
 
-            public FileData(StorageFile file) => 
+            public FileData(IStorageFile file) => 
                 _file = file;
 
             public async Task ConnectAsInputAsync(AudioSystem system) => 
